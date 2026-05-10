@@ -252,9 +252,6 @@ export default function MembersClient({ members }: { members: Member[] }) {
           <h1 className="font-anton text-[40px] uppercase leading-none sm:text-[60px] md:text-[75px]">
             Members
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl font-mono text-sm uppercase text-space-cream/60 md:text-base">
-            Team member profiles pulled from the Super AI Google Sheet.
-          </p>
         </div>
       </section>
 
