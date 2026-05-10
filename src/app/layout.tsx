@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Anton, Pacifico } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton" });
+const pacifico = Pacifico({ weight: "400", subsets: ["latin"], variable: "--font-cursive" });
 
 export const metadata: Metadata = {
   title: "Our Portfolio",
-  description: "Showcasing our work and achievements",
+  description: "Showcasing our work and achievements — Beyond Limits",
 };
 
 export default function RootLayout({
@@ -18,10 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body className={inter.className}>
+      <body className={`${anton.variable} ${pacifico.variable} antialiased bg-[#010828] text-[#EFF4FF]`}>
         <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <main>{children}</main>
       </body>
     </html>
   );

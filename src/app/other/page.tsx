@@ -1,51 +1,39 @@
+import Footer from "@/components/Footer";
+
 export default function OtherPage() {
   return (
-    <div>
+    <div className="bg-space-bg text-space-cream pt-20">
       {/* Header */}
-      <section className="bg-primary text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Other</h1>
-          <p className="text-xl text-blue-200 max-w-2xl mx-auto">
+      <section className="relative py-20 overflow-hidden">
+        <div className="absolute inset-0 stars-layer opacity-30" />
+        <div className="relative max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="font-anton text-[40px] sm:text-[60px] md:text-[75px] uppercase">Other</h1>
+          <p className="font-mono text-sm md:text-base uppercase text-space-cream/60 max-w-2xl mx-auto mt-4">
             Additional information, resources, and updates.
           </p>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-16 bg-surface">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-6 bg-white border border-blue-100 rounded-lg hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-semibold text-primary mb-3">Resources</h3>
-              <p className="text-gray-600 mb-4">
-                Useful documents, templates, and reference materials for our team.
-              </p>
-              <span className="text-sm text-accent font-medium">Coming soon</span>
-            </div>
-            <div className="p-6 bg-white border border-blue-100 rounded-lg hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-semibold text-primary mb-3">News & Updates</h3>
-              <p className="text-gray-600 mb-4">
-                Stay informed about the latest developments and announcements.
-              </p>
-              <span className="text-sm text-accent font-medium">Coming soon</span>
-            </div>
-            <div className="p-6 bg-white border border-blue-100 rounded-lg hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-semibold text-primary mb-3">FAQ</h3>
-              <p className="text-gray-600 mb-4">
-                Frequently asked questions and helpful answers.
-              </p>
-              <span className="text-sm text-accent font-medium">Coming soon</span>
-            </div>
-            <div className="p-6 bg-white border border-blue-100 rounded-lg hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-semibold text-primary mb-3">Contact</h3>
-              <p className="text-gray-600 mb-4">
-                Get in touch with us for inquiries and collaboration opportunities.
-              </p>
-              <span className="text-sm text-accent font-medium">Coming soon</span>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { title: "Resources", desc: "Useful documents, templates, and reference materials for our team." },
+              { title: "News & Updates", desc: "Stay informed about the latest developments and announcements." },
+              { title: "FAQ", desc: "Frequently asked questions and helpful answers." },
+              { title: "Contact", desc: "Get in touch with us for inquiries and collaboration opportunities." },
+            ].map((item, i) => (
+              <div key={i} className="liquid-glass rounded-2xl p-6 hover:bg-white/5 transition-colors">
+                <h3 className="font-anton text-xl uppercase mb-3">{item.title}</h3>
+                <p className="font-mono text-xs text-space-cream/60 mb-4">{item.desc}</p>
+                <span className="font-mono text-xs text-accent">Coming soon</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }

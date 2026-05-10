@@ -23,6 +23,14 @@ const config: Config = {
           DEFAULT: "#FEFFFE",
           muted: "#f5f7fa",
         },
+        space: {
+          bg: "#010828",
+          cream: "#EFF4FF",
+        },
+      },
+      fontFamily: {
+        anton: ["var(--font-anton)", "sans-serif"],
+        cursive: ["var(--font-cursive)", "cursive"],
       },
     },
   },

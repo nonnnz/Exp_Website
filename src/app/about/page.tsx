@@ -1,60 +1,57 @@
+import Footer from "@/components/Footer";
+
 export default function AboutPage() {
   return (
-    <div>
+    <div className="bg-space-bg text-space-cream pt-20">
       {/* Header */}
-      <section className="bg-primary text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">About Us</h1>
-          <p className="text-xl text-blue-200 max-w-2xl mx-auto">
+      <section className="relative py-20 overflow-hidden">
+        <div className="absolute inset-0 stars-layer opacity-30" />
+        <div className="relative max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="font-anton text-[40px] sm:text-[60px] md:text-[75px] uppercase">About Us</h1>
+          <p className="font-mono text-sm md:text-base uppercase text-space-cream/60 max-w-2xl mx-auto mt-4">
             Learn more about who we are and what drives us forward.
           </p>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-16 bg-surface">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="prose prose-lg max-w-none">
-            <h2 className="text-3xl font-bold text-primary mb-6">Our Story</h2>
-            <p className="text-gray-600 mb-6 leading-relaxed">
-              We are a dedicated team committed to excellence in everything we do. 
-              Our journey began with a shared vision to create meaningful impact through 
-              collaboration, innovation, and hard work.
-            </p>
-            <p className="text-gray-600 mb-6 leading-relaxed">
-              Over the years, we have grown both in numbers and in expertise, 
-              consistently pushing boundaries and setting new standards in our field.
-            </p>
+          <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-6">Our Story</h2>
+          <p className="font-mono text-sm text-space-cream/70 mb-6 leading-relaxed">
+            We are a dedicated team committed to excellence in everything we do. 
+            Our journey began with a shared vision to create meaningful impact through 
+            collaboration, innovation, and hard work.
+          </p>
+          <p className="font-mono text-sm text-space-cream/70 mb-12 leading-relaxed">
+            Over the years, we have grown both in numbers and in expertise, 
+            consistently pushing boundaries and setting new standards in our field.
+          </p>
 
-            <h2 className="text-3xl font-bold text-primary mb-6 mt-12">Our Mission</h2>
-            <p className="text-gray-600 mb-6 leading-relaxed">
-              To deliver outstanding results through teamwork, creativity, and a 
-              relentless pursuit of quality. We believe in empowering each member 
-              to reach their full potential.
-            </p>
+          <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-6">Our Mission</h2>
+          <p className="font-mono text-sm text-space-cream/70 mb-12 leading-relaxed">
+            To deliver outstanding results through teamwork, creativity, and a 
+            relentless pursuit of quality. We believe in empowering each member 
+            to reach their full potential.
+          </p>
 
-            <h2 className="text-3xl font-bold text-primary mb-6 mt-12">Our Values</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-              <div className="p-6 bg-white rounded-lg border border-blue-100 shadow-sm">
-                <h3 className="text-xl font-semibold text-primary mb-2">Excellence</h3>
-                <p className="text-gray-600">Striving for the highest quality in all our endeavors.</p>
+          <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-8">Our Values</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { title: "Excellence", desc: "Striving for the highest quality in all our endeavors." },
+              { title: "Integrity", desc: "Acting with honesty and transparency in everything we do." },
+              { title: "Innovation", desc: "Embracing new ideas and creative solutions." },
+              { title: "Collaboration", desc: "Working together to achieve shared goals." },
+            ].map((v, i) => (
+              <div key={i} className="liquid-glass rounded-2xl p-6">
+                <h3 className="font-anton text-xl uppercase mb-2">{v.title}</h3>
+                <p className="font-mono text-sm text-space-cream/60">{v.desc}</p>
               </div>
-              <div className="p-6 bg-white rounded-lg border border-blue-100 shadow-sm">
-                <h3 className="text-xl font-semibold text-primary mb-2">Integrity</h3>
-                <p className="text-gray-600">Acting with honesty and transparency in everything we do.</p>
-              </div>
-              <div className="p-6 bg-white rounded-lg border border-blue-100 shadow-sm">
-                <h3 className="text-xl font-semibold text-primary mb-2">Innovation</h3>
-                <p className="text-gray-600">Embracing new ideas and creative solutions.</p>
-              </div>
-              <div className="p-6 bg-white rounded-lg border border-blue-100 shadow-sm">
-                <h3 className="text-xl font-semibold text-primary mb-2">Collaboration</h3>
-                <p className="text-gray-600">Working together to achieve shared goals.</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }

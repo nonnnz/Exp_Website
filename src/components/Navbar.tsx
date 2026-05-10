@@ -17,80 +17,65 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-primary text-white shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link href="/" className="text-xl font-bold tracking-wide text-accent">
-              PORTFOLIO
-            </Link>
-          </div>
+    <nav className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 py-4">
+      <div className="max-w-[1831px] mx-auto flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="font-anton text-base uppercase tracking-wider text-accent">
+          Portfolio
+        </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-1">
+        {/* Desktop Navigation - Liquid Glass */}
+        <div className="hidden lg:block">
+          <div className="liquid-glass rounded-[28px] px-8 xl:px-[52px] py-5">
+            <div className="flex items-center gap-6 xl:gap-8">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-light transition-colors duration-200"
+                  className="font-anton text-[13px] uppercase tracking-wide text-space-cream hover:text-accent transition-colors duration-200"
                 >
                   {link.label}
                 </Link>
               ))}
             </div>
           </div>
+        </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-accent"
-              aria-expanded={isOpen}
-              aria-label="Toggle navigation menu"
-            >
-              <svg
-                className="h-6 w-6"
-                stroke="currentColor"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
+        {/* Mobile menu button */}
+        <div className="lg:hidden">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="liquid-glass rounded-xl p-3 hover:bg-white/10 transition-colors"
+            aria-expanded={isOpen}
+            aria-label="Toggle navigation menu"
+          >
+            <svg className="h-5 w-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+              {isOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
       </div>
 
       {/* Mobile Navigation */}
       {isOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary-light transition-colors duration-200"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+        <div className="lg:hidden mt-4">
+          <div className="liquid-glass rounded-2xl px-6 py-4">
+            <div className="flex flex-col gap-3">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="font-anton text-sm uppercase tracking-wide text-space-cream hover:text-accent transition-colors duration-200 py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       )}
