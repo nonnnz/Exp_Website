@@ -10,7 +10,6 @@ const navLinks = [
   { href: "/gallery", label: "Gallery" },
   { href: "/recognition", label: "Recognition" },
   { href: "/clip", label: "Clip" },
-  { href: "/other", label: "Other" },
 ];
 
 export default function Navbar() {

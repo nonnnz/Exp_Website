@@ -197,23 +197,26 @@ export default function AboutPage() {
             Our Story
           </h2>
           <p className="font-mono text-sm text-space-cream/70 mb-6 leading-relaxed">
-            We are a dedicated team committed to excellence in everything we do.
-            Our journey began with a shared vision to create meaningful impact
-            through collaboration, innovation, and hard work.
+            EXP began with one shared belief: <span className="text-space-cream font-semibold">experience teaches</span> — <em>Experientia Docet</em>.
+          </p>
+          <p className="font-mono text-sm text-space-cream/70 mb-6 leading-relaxed">
+            We are a team of explorers, creators, and problem-solvers who learn by doing, grow through every mission, and turn every challenge into a new discovery.
+          </p>
+          <p className="font-mono text-sm text-space-cream/70 mb-6 leading-relaxed">
+            Like stars in the same galaxy, each member brings different skills, ideas, and energy. Together, we travel beyond familiar boundaries, support one another through every orbit, and create work that reflects our teamwork, creativity, and dedication.
           </p>
           <p className="font-mono text-sm text-space-cream/70 mb-12 leading-relaxed">
-            Over the years, we have grown both in numbers and in expertise,
-            consistently pushing boundaries and setting new standards in our
-            field.
+            Our journey is not only about reaching the destination. It is about the experience we collect along the way.
           </p>
 
           <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-6">
             Our Mission
           </h2>
+          <p className="font-mono text-sm text-space-cream/70 mb-6 leading-relaxed">
+            To explore new ideas, create meaningful work, and grow through real experience.
+          </p>
           <p className="font-mono text-sm text-space-cream/70 mb-12 leading-relaxed">
-            To deliver outstanding results through teamwork, creativity, and a
-            relentless pursuit of quality. We believe in empowering each member
-            to reach their full potential.
+            We aim to use teamwork, creativity, and curiosity to complete every mission with purpose, quality, and pride.
           </p>
 
           <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-8">
@@ -221,10 +224,22 @@ export default function AboutPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
-              { title: "Excellence", desc: "Striving for the highest quality in all our endeavors." },
-              { title: "Integrity", desc: "Acting with honesty and transparency in everything we do." },
-              { title: "Innovation", desc: "Embracing new ideas and creative solutions." },
-              { title: "Collaboration", desc: "Working together to achieve shared goals." },
+              {
+                title: "Experience",
+                desc: "We believe every mission teaches us something valuable. Each challenge helps us become better, stronger, and more prepared for the next journey.",
+              },
+              {
+                title: "Exploration",
+                desc: "We are not afraid to go beyond the usual path. We welcome new ideas, new perspectives, and new ways to solve problems.",
+              },
+              {
+                title: "Collaboration",
+                desc: "Every crew member matters. We work together, support each other, and combine our strengths to move the whole team forward.",
+              },
+              {
+                title: "Creativity",
+                desc: "We turn imagination into action. From small ideas to big missions, we use creativity to make our universe more exciting.",
+              },
             ].map((v, i) => (
               <div key={i} className="liquid-glass rounded-2xl p-6">
                 <h3 className="font-anton text-xl uppercase mb-2">{v.title}</h3>

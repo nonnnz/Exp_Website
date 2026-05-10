@@ -20,52 +20,46 @@ export default function HomePage() {
 
         {/* Social Icons - Desktop */}
         <div className="absolute top-28 right-6 lg:right-10 hidden lg:flex flex-col gap-3">
-          {["M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-            "M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z",
-            "M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"
-          ].map((path, i) => (
-            <button key={i} className="liquid-glass w-14 h-14 rounded-[1rem] flex items-center justify-center hover:bg-white/10 transition-colors">
-              <svg className="w-5 h-5 text-space-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d={path} />
-              </svg>
-            </button>
-          ))}
+          <a href="https://www.instagram.com/exp.ectonum?igsh=cXQ3aHZoaWY0Y3Jv" target="_blank" rel="noopener noreferrer" className="liquid-glass w-14 h-14 rounded-[1rem] flex items-center justify-center hover:bg-white/10 transition-colors">
+            <svg className="w-5 h-5 text-space-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+            </svg>
+          </a>
         </div>
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-[780px] lg:ml-32">
             <h1 className="font-anton text-[40px] sm:text-[60px] md:text-[75px] lg:text-[90px] uppercase leading-[1.05] md:leading-[1]">
-              Beyond earth<br />
-              and <span className="text-accent">(</span> its <span className="text-accent">)</span> familiar<br />
-              boundaries
+              EXP<br />
+              EXPERIENTIA DOCET
+              WHERE OUR CREW LEARNS BY DOING
             </h1>
             {/* Cursive accent */}
             <div className="relative">
               <span className="font-cursive text-accent text-2xl sm:text-3xl md:text-4xl lg:text-5xl absolute -top-16 sm:-top-20 md:-top-24 right-0 lg:right-[-80px] -rotate-1 opacity-90 mix-blend-exclusion">
-                Our Portfolio
+                EXP forever
               </span>
             </div>
           </div>
 
           {/* Social Icons - Mobile */}
           <div className="flex lg:hidden gap-3 mt-10 justify-center">
-            {["M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-              "M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z",
-              "M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"
-            ].map((path, i) => (
-              <button key={i} className="liquid-glass w-14 h-14 rounded-[1rem] flex items-center justify-center hover:bg-white/10 transition-colors">
-                <svg className="w-5 h-5 text-space-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d={path} />
-                </svg>
-              </button>
-            ))}
+            <a href="https://www.instagram.com/exp.ectonum?igsh=cXQ3aHZoaWY0Y3Jv" target="_blank" rel="noopener noreferrer" className="liquid-glass w-14 h-14 rounded-[1rem] flex items-center justify-center hover:bg-white/10 transition-colors">
+              <svg className="w-5 h-5 text-space-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+              </svg>
+            </a>
           </div>
         </div>
       </section>
 
-      {/* ===== SECTION 2: ABOUT / INTRO (hidden) ===== */}
-      {/* <section className="relative min-h-screen flex items-center">
+      {/* ===== SECTION 2: INTRO ===== */}
+      <section className="relative min-h-screen flex items-center">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-tl from-[#1a0a3e]/50 via-space-bg to-[#0B3D91]/30" />
           <div className="stars-layer absolute inset-0 opacity-50" />
@@ -76,93 +70,16 @@ export default function HomePage() {
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-20">
             <div className="relative">
               <h2 className="font-anton text-[32px] sm:text-[48px] md:text-[60px] uppercase leading-[1.1]">
-                Hello!<br />
-                I&apos;m <span className="text-accent">Portfolio</span>
+                Gain EXP<br />
+                SIX <span className="text-accent">SEVEN</span>
               </h2>
-              <span className="font-cursive text-accent text-[36px] sm:text-[50px] md:text-[68px] absolute bottom-0 right-0 lg:right-[-60px] -rotate-1 opacity-90 mix-blend-exclusion">
-                Team
-              </span>
             </div>
-            <p className="font-mono text-sm md:text-base uppercase max-w-[266px] text-space-cream/80 leading-relaxed">
-              A dedicated team pushing beyond limits. An exploration of excellence, innovation, and collaboration in every mission.
-            </p>
-          </div>
-
-          <div className="flex justify-between">
-            <p className="font-mono text-sm uppercase text-space-cream/10 max-w-[300px] leading-relaxed">
-              A dedicated team pushing beyond limits. An exploration of excellence, innovation, and collaboration in every mission.
-            </p>
-            <p className="font-mono text-sm uppercase text-space-cream/10 max-w-[300px] leading-relaxed hidden lg:block">
-              A dedicated team pushing beyond limits. An exploration of excellence, innovation, and collaboration in every mission.
-            </p>
-          </div>
-        </div>
-      </section> */}
-
-      {/* ===== SECTION 3: COLLECTION GRID ===== */}
-      <section className="relative py-16 md:py-24">
-        <div className="max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header Row */}
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-12">
-            <h2 className="font-anton text-[32px] sm:text-[48px] md:text-[60px] uppercase leading-[1.1]">
-              Collection of<br />
-              <span className="ml-12 md:ml-24 lg:ml-32">
-                <span className="font-cursive text-accent normal-case">Space</span> objects
-              </span>
-            </h2>
-            <div className="flex-shrink-0">
-              <div className="flex items-baseline gap-2">
-                <span className="font-anton text-[32px] sm:text-[48px] md:text-[60px] uppercase">See</span>
-                <div className="flex flex-col leading-tight">
-                  <span className="font-anton text-[20px] sm:text-[28px] md:text-[36px] uppercase">All</span>
-                  <span className="font-anton text-[20px] sm:text-[28px] md:text-[36px] uppercase">Creators</span>
-                </div>
-              </div>
-              <div className="bg-accent h-[6px] md:h-[10px] w-full rounded-full mt-2" />
-            </div>
-          </div>
-
-          {/* Card Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { title: "Nebula Genesis", score: "8.7/10" },
-              { title: "Cosmic Drift", score: "9/10" },
-              { title: "Dark Matter", score: "8.2/10" },
-            ].map((card, i) => (
-              <div key={i} className="liquid-glass rounded-[32px] p-[18px] hover:bg-white/10 transition-colors duration-300">
-                {/* Card visual */}
-                <div className="relative pb-[100%] rounded-[24px] overflow-hidden bg-gradient-to-br from-primary/40 via-space-bg to-[#1a0a3e]/60">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="stars-layer absolute inset-0 opacity-70" />
-                    {/* Planet/Object */}
-                    <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${
-                      i === 0 ? 'bg-gradient-to-br from-accent/60 to-primary' :
-                      i === 1 ? 'bg-gradient-to-br from-blue-400/60 to-[#1a0a3e]' :
-                      'bg-gradient-to-br from-purple-500/60 to-primary-dark'
-                    } shadow-lg glow-pulse`} />
-                  </div>
-                </div>
-                {/* Overlay bar */}
-                <div className="liquid-glass rounded-[20px] px-5 py-4 mt-3 flex items-center justify-between">
-                  <div>
-                    <p className="text-[11px] text-space-cream/70 uppercase tracking-wider">Rarity Score:</p>
-                    <p className="text-base font-semibold">{card.score}</p>
-                  </div>
-                  <button className="w-12 h-12 rounded-full bg-gradient-to-br from-[#b724ff] to-[#7c3aed] flex items-center justify-center shadow-lg shadow-purple-500/50 hover:scale-110 transition-transform">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M9 18l6-6-6-6" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* ===== SECTION 4: CTA ===== */}
+      {/* ===== SECTION 3: CTA ===== */}
       <section className="relative py-24 md:py-32">
-        {/* Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-t from-space-bg via-primary/20 to-space-bg" />
           <div className="stars-layer absolute inset-0 opacity-40" />
@@ -171,7 +88,6 @@ export default function HomePage() {
 
         <div className="relative z-10 max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:pl-[15%] lg:pr-[20%]">
-            {/* Cursive accent */}
             <span className="font-cursive text-accent text-[17px] sm:text-[36px] md:text-[50px] lg:text-[68px] block mb-4 opacity-90 mix-blend-exclusion">
               Go beyond
             </span>
@@ -187,16 +103,13 @@ export default function HomePage() {
           {/* Social Icons - Bottom left */}
           <div className="absolute left-[8%] bottom-[12%] md:bottom-[20%] hidden lg:block">
             <div className="liquid-glass rounded-[1.25rem] overflow-hidden">
-              {["M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-                "M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z",
-                "M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"
-              ].map((path, i) => (
-                <button key={i} className={`w-16 h-16 flex items-center justify-center hover:bg-white/10 transition-colors ${i < 2 ? 'border-b border-white/10' : ''}`}>
-                  <svg className="w-5 h-5 text-space-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d={path} />
-                  </svg>
-                </button>
-              ))}
+              <a href="https://www.instagram.com/exp.ectonum?igsh=cXQ3aHZoaWY0Y3Jv" target="_blank" rel="noopener noreferrer" className="w-16 h-16 flex items-center justify-center hover:bg-white/10 transition-colors">
+                <svg className="w-5 h-5 text-space-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+                </svg>
+              </a>
             </div>
           </div>
         </div>
