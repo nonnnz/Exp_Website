@@ -12,7 +12,7 @@ export default function HomePage() {
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
           >
-            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4" type="video/mp4" />
+            <source src="/motto.mp4" type="video/mp4" />
           </video>
           {/* Dark overlay for readability */}
           <div className="absolute inset-0 bg-space-bg/40" />
