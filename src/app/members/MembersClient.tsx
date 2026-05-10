@@ -5,14 +5,22 @@ import { INTEREST_DEFS, type InterestId, type Member } from "./members-data";
 
 type SortOption = "id-asc" | "id-desc" | "name-asc" | "role";
 
-const interestIds = Object.keys(INTEREST_DEFS) as InterestId[];
-
 const sortOptions: { id: SortOption; label: string }[] = [
   { id: "id-asc", label: "Member ID ↑" },
   { id: "id-desc", label: "Member ID ↓" },
   { id: "name-asc", label: "Name A-Z" },
   { id: "role", label: "Role" },
 ];
+
+function getInterestDef(id: InterestId) {
+  const normalized = id.trim().toLowerCase();
+  return INTEREST_DEFS[normalized] ?? {
+    en: id,
+    th: id,
+    tone: "slate",
+    glyph: id.replace(/[^A-Za-z0-9]/g, "").slice(0, 3).toUpperCase() || "AI",
+  };
+}
 
 function MemberAvatar({ member, size = "large" }: { member: Member; size?: "small" | "large" }) {
   const dimension = size === "small" ? "h-14 w-14" : "h-28 w-28";
@@ -36,7 +44,7 @@ function MemberAvatar({ member, size = "large" }: { member: Member; size?: "smal
 }
 
 function InterestBadge({ id }: { id: InterestId }) {
-  const interest = INTEREST_DEFS[id];
+  const interest = getInterestDef(id);
 
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[10px] uppercase text-space-cream/75">
@@ -133,22 +141,34 @@ function MemberModal({ member, onClose }: { member: Member; onClose: () => void 
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <aside className="space-y-4 font-mono text-xs uppercase text-space-cream/65">
             <div>
+              <p className="text-accent">Project ID</p>
+              <p>{member.id}</p>
+            </div>
+            <div>
               <p className="text-accent">Role</p>
               <p>{member.role.en}</p>
               <p className="text-space-cream/35">{member.role.th}</p>
             </div>
-            <div>
-              <p className="text-accent">Email</p>
-              <a href={`mailto:${member.email}`} className="hover:text-accent">{member.email}</a>
-            </div>
-            <div>
-              <p className="text-accent">GitHub</p>
-              <p>{member.github}</p>
-            </div>
-            <div>
-              <p className="text-accent">LinkedIn</p>
-              <p>{member.linkedin}</p>
-            </div>
+            {member.cvUrl && (
+              <a
+                href={member.cvUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="liquid-glass flex min-h-12 items-center justify-center rounded-2xl px-4 text-center text-space-cream transition hover:bg-white/10 hover:text-accent"
+              >
+                Open CV
+              </a>
+            )}
+            {member.videoUrl && (
+              <a
+                href={member.videoUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="liquid-glass flex min-h-12 items-center justify-center rounded-2xl px-4 text-center text-space-cream transition hover:bg-white/10 hover:text-accent"
+              >
+                Watch Video
+              </a>
+            )}
           </aside>
 
           <div className="space-y-8">
@@ -193,6 +213,19 @@ export default function MembersClient({ members }: { members: Member[] }) {
   const [filters, setFilters] = useState<InterestId[]>([]);
   const [activeMember, setActiveMember] = useState<Member | null>(null);
 
+  const interestIds = useMemo(() => {
+    const seen = new Set<string>();
+    return members
+      .flatMap((member) => member.interests)
+      .filter((interest) => {
+        const key = interest.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a, b) => a.localeCompare(b));
+  }, [members]);
+
   const filteredMembers = useMemo(() => {
     const needle = query.trim().toLowerCase();
 
@@ -203,7 +236,8 @@ export default function MembersClient({ members }: { members: Member[] }) {
         member.name.th.toLowerCase().includes(needle) ||
         member.nickname.en.toLowerCase().includes(needle) ||
         member.nickname.th.toLowerCase().includes(needle) ||
-        member.role.en.toLowerCase().includes(needle);
+        member.role.en.toLowerCase().includes(needle) ||
+        member.interests.some((interest) => interest.toLowerCase().includes(needle));
 
       const matchesFilters = filters.every((filter) => member.interests.includes(filter));
       return matchesQuery && matchesFilters;
@@ -229,7 +263,7 @@ export default function MembersClient({ members }: { members: Member[] }) {
             Members
           </h1>
           <p className="mx-auto mt-4 max-w-2xl font-mono text-sm uppercase text-space-cream/60 md:text-base">
-            Team member profiles from the Members branch, presented in the latest main branch space design.
+            Team member profiles pulled from the Super AI Google Sheet.
           </p>
         </div>
       </section>
@@ -272,7 +306,7 @@ export default function MembersClient({ members }: { members: Member[] }) {
                         : "border-white/10 bg-white/5 text-space-cream/55 hover:text-accent"
                     }`}
                   >
-                    {INTEREST_DEFS[interest].en}
+                    {getInterestDef(interest).en}
                   </button>
                 );
               })}
