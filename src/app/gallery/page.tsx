@@ -24,7 +24,7 @@ export default function GalleryPage() {
   const [images, setImages] = useState<Img[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const cols = useColumns();
 
@@ -58,11 +58,14 @@ export default function GalleryPage() {
     return () => window.removeEventListener("keydown", h);
   }, [lightboxIndex, close, goNext, goPrev]);
 
-  // Chunk into rows
-  const rows: Img[][] = [];
-  for (let i = 0; i < images.length; i += cols) rows.push(images.slice(i, i + cols));
+  // Distribute images round-robin into columns (natural masonry order)
+  const columns: Array<Array<{ img: Img; globalIdx: number }>> = Array.from({ length: cols }, () => []);
+  images.forEach((img, idx) => {
+    columns[idx % cols].push({ img, globalIdx: idx });
+  });
 
-  const ROW_H = typeof window !== "undefined" && window.innerWidth < 640 ? 160 : typeof window !== "undefined" && window.innerWidth < 1024 ? 220 : 280;
+  const hoveredCol = hoveredIdx !== null ? hoveredIdx % cols : null;
+  const isAnyHovered = hoveredIdx !== null;
 
   return (
     <div className="min-h-screen bg-space-bg text-space-cream">
@@ -82,14 +85,15 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Grid */}
+      {/* Gallery — flex columns */}
       <section className="mx-auto max-w-[1831px] px-3 py-8 sm:px-4 lg:px-6">
         {isLoading ? (
-          <div className="flex flex-col gap-2">
-            {[280, 240, 260].map((h, i) => (
-              <div key={i} className="flex gap-2">
-                {Array.from({ length: cols }).map((_, j) => (
-                  <div key={j} className="animate-pulse rounded-[12px] bg-white/8 flex-1" style={{ height: h }} />
+          // Skeleton: fixed columns with placeholder boxes
+          <div style={{ display: "flex", gap: 8 }}>
+            {Array.from({ length: cols }).map((_, ci) => (
+              <div key={ci} style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+                {[220, 310, 180].map((h, i) => (
+                  <div key={i} className="animate-pulse rounded-[12px] bg-white/8" style={{ height: h }} />
                 ))}
               </div>
             ))}
@@ -102,57 +106,78 @@ export default function GalleryPage() {
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
-            {rows.map((row, ri) => (
-              <div key={ri} className="flex gap-2" style={{ height: ROW_H }}>
-                {row.map((img, ci) => {
-                  const globalIdx = ri * cols + ci;
-                  const isHov = hoveredId === img.id;
-                  const isDim = hoveredId !== null && !isHov;
-                  return (
-                    <button
-                      key={img.id}
-                      type="button"
-                      aria-label={`View image ${globalIdx + 1}`}
-                      onClick={() => open(globalIdx)}
-                      onMouseEnter={() => setHoveredId(img.id)}
-                      onMouseLeave={() => setHoveredId(null)}
-                      style={{
-                        flexGrow: isHov ? 2 : 1,
-                        flexShrink: 1,
-                        flexBasis: 0,
-                        minWidth: 0,
-                        height: "100%",
-                        transition: "flex-grow 0.42s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, filter 0.3s ease",
-                        overflow: "hidden",
-                        borderRadius: 12,
-                        opacity: isDim ? 0.45 : 1,
-                        filter: isDim ? "brightness(0.6) saturate(0.5)" : "none",
-                        outline: "none",
-                        cursor: "zoom-in",
-                        position: "relative",
-                      }}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={img.src}
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
+          // Real flex-column layout — flex-grow animates the whole column width
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+            {columns.map((colItems, colIdx) => {
+              const isHovCol = hoveredCol === colIdx;
+              return (
+                <div
+                  key={colIdx}
+                  style={{
+                    // The magic: hovered column grows to 2x, others shrink proportionally
+                    flexGrow: isHovCol ? 2 : 1,
+                    flexShrink: 1,
+                    flexBasis: 0,
+                    minWidth: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8,
+                    transition: "flex-grow 0.42s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
+                  {colItems.map(({ img, globalIdx }) => {
+                    const isHov = hoveredIdx === globalIdx;
+                    const isDim = isAnyHovered && !isHov;
+                    return (
+                      <button
+                        key={img.id}
+                        type="button"
+                        aria-label={`View image ${globalIdx + 1}`}
+                        onClick={() => open(globalIdx)}
+                        onMouseEnter={() => setHoveredIdx(globalIdx)}
+                        onMouseLeave={() => setHoveredIdx(null)}
                         style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
                           display: "block",
-                          transform: isHov ? "scale(1.04)" : "scale(1)",
-                          transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                          width: "100%",
+                          padding: 0,
+                          border: "none",
+                          background: "none",
+                          outline: "none",
+                          cursor: "zoom-in",
+                          borderRadius: 12,
+                          overflow: "hidden",
+                          // Per-image: scale pop + dim
+                          transform: isHov ? "scale(1.03)" : "scale(1)",
+                          opacity: isDim ? 0.35 : 1,
+                          filter: isDim ? "brightness(0.5) saturate(0.4)" : "none",
+                          boxShadow: isHov ? "0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.07)" : "none",
+                          transition:
+                            "transform 0.38s cubic-bezier(0.34, 1.2, 0.64, 1), " +
+                            "opacity 0.28s ease, filter 0.28s ease, box-shadow 0.28s ease",
+                          zIndex: isHov ? 10 : 0,
+                          position: "relative",
                         }}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={img.src}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          style={{
+                            display: "block",
+                            width: "100%",
+                            height: "auto", // ← natural ratio!
+                            transition: "transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)",
+                            transform: isHov ? "scale(1.04)" : "scale(1)",
+                          }}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
           </div>
         )}
       </section>
@@ -216,8 +241,6 @@ function Lightbox({ image, index, total, onClose, onNext, onPrev }: {
           style={{ transform: `translate3d(${pan.x}px,${pan.y}px,0) scale(${zoom})`, transition: drag.current ? "none" : "transform 0.2s ease-out" }}
         />
       </div>
-
-      {/* Top bar */}
       <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-4 py-4">
         <span className="pointer-events-auto rounded-full bg-black/50 px-4 py-2 font-mono text-xs uppercase text-white/60 backdrop-blur">
           {index + 1} / {total}
@@ -239,7 +262,6 @@ function Lightbox({ image, index, total, onClose, onNext, onPrev }: {
           </button>
         </div>
       </div>
-
       {total > 1 && <>
         <button onClick={onPrev} className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-black/50 text-white/70 backdrop-blur hover:bg-white/15 hover:text-white" aria-label="Previous">
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
