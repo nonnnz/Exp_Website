@@ -173,16 +173,6 @@ function MemberModal({ member, onClose }: { member: Member; onClose: () => void 
 
           <div className="space-y-8">
             <section>
-              <p className="mb-3 font-anton text-2xl uppercase text-space-cream">Motto</p>
-              <p className="font-mono text-sm uppercase leading-relaxed text-space-cream/70">
-                {member.motto.en}
-              </p>
-              <p className="mt-2 font-mono text-sm leading-relaxed text-space-cream/45">
-                {member.motto.th}
-              </p>
-            </section>
-
-            <section>
               <p className="mb-3 font-anton text-2xl uppercase text-space-cream">AI Interests</p>
               <div className="flex flex-wrap gap-2">
                 {member.interests.map((interest) => (
@@ -252,9 +242,6 @@ export default function MembersClient({ members }: { members: Member[] }) {
           <h1 className="font-anton text-[40px] uppercase leading-none sm:text-[60px] md:text-[75px]">
             Members
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl font-mono text-sm uppercase text-space-cream/60 md:text-base">
-            Say hello to the space crew powering the EXP universe
-          </p>
         </div>
       </section>
 

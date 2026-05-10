@@ -143,6 +143,21 @@ export default function ClipPage() {
 
   useEffect(() => {
     async function fetchClips() {
+      // Check sessionStorage cache first
+      const CACHE_KEY = "clips_cache";
+      const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+      try {
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < CACHE_TTL) {
+            setClips(data);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch { /* ignore cache read errors */ }
+
       try {
         const response = await fetch(SHEET_URL);
         const text = await response.text();
@@ -245,7 +260,13 @@ export default function ClipPage() {
           };
         }));
 
-        setClips(parsedClips.filter(c => c !== null) as Clip[]);
+        const result = parsedClips.filter(c => c !== null) as Clip[];
+        setClips(result);
+
+        // Save to sessionStorage cache
+        try {
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: result, timestamp: Date.now() }));
+        } catch { /* ignore cache write errors (e.g. quota exceeded) */ }
       } catch (error) {
         console.error("Error loading clips:", error);
       } finally {
