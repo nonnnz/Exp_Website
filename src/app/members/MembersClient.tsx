@@ -183,16 +183,6 @@ function MemberModal({ member, onClose }: { member: Member; onClose: () => void 
             </section>
 
             <section>
-              <p className="mb-3 font-anton text-2xl uppercase text-space-cream">About</p>
-              <p className="font-mono text-sm uppercase leading-relaxed text-space-cream/70">
-                {member.bio.en}
-              </p>
-              <p className="mt-2 font-mono text-sm leading-relaxed text-space-cream/45">
-                {member.bio.th}
-              </p>
-            </section>
-
-            <section>
               <p className="mb-3 font-anton text-2xl uppercase text-space-cream">AI Interests</p>
               <div className="flex flex-wrap gap-2">
                 {member.interests.map((interest) => (
