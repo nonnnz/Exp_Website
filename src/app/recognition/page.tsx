@@ -4,11 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Footer from "@/components/Footer";
 
 const awards = [
-  { year: "2024", title: "Excellence Award", description: "Recognized for outstanding performance and innovation.", organization: "Industry Association", type: "trophy" },
-  { year: "2024", title: "Best Team Award", description: "Awarded for exceptional teamwork and collaboration.", organization: "National Committee", type: "shield" },
-  { year: "2023", title: "Innovation Prize", description: "Honored for groundbreaking research and development.", organization: "Technology Council", type: "star" },
-  { year: "2023", title: "Community Impact Award", description: "Recognized for positive contributions to the community.", organization: "Local Government", type: "medal" },
-  { year: "2022", title: "Rising Star Award", description: "Acknowledged as an emerging leader in the field.", organization: "Professional Society", type: "star" },
+  { year: "2025", title: "Team website deployment", description: "Our team website has been created with Next.JS and deployed on Vercel. Hooray!", organization: "Super AI engineer season 6 Team EXP", type: "trophy" },
 ];
 
 const icons: Record<string, React.ReactNode> = {
