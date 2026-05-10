@@ -82,6 +82,12 @@ function MemberCard({ member, onOpen }: { member: Member; onOpen: (member: Membe
         “{member.motto.en}”
       </p>
 
+      {member.achievements.length > 0 && (
+        <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-accent">
+          {member.achievements.length} award / research item{member.achievements.length === 1 ? "" : "s"}
+        </p>
+      )}
+
       <div className="flex flex-wrap gap-2">
         {member.interests.slice(0, 3).map((interest) => (
           <InterestBadge key={interest} id={interest} />
@@ -180,6 +186,36 @@ function MemberModal({ member, onClose }: { member: Member; onClose: () => void 
                 ))}
               </div>
             </section>
+
+            {member.achievements.length > 0 && (
+              <section>
+                <p className="mb-4 font-anton text-2xl uppercase text-space-cream">Awards / Research</p>
+                <div className="space-y-3">
+                  {member.achievements.map((achievement, index) => (
+                    <div
+                      key={`${achievement.projectName}-${achievement.award}-${achievement.research}-${index}`}
+                      className="rounded-2xl border border-white/10 bg-white/5 p-4 font-mono text-xs uppercase leading-relaxed text-space-cream/70"
+                    >
+                      {achievement.projectName && (
+                        <p>
+                          <span className="text-accent">Project:</span> {achievement.projectName}
+                        </p>
+                      )}
+                      {achievement.award && (
+                        <p>
+                          <span className="text-accent">Award:</span> {achievement.award}
+                        </p>
+                      )}
+                      {achievement.research && (
+                        <p>
+                          <span className="text-accent">Research:</span> {achievement.research}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
         </div>
       </article>
@@ -217,7 +253,12 @@ export default function MembersClient({ members }: { members: Member[] }) {
         member.nickname.en.toLowerCase().includes(needle) ||
         member.nickname.th.toLowerCase().includes(needle) ||
         member.role.en.toLowerCase().includes(needle) ||
-        member.interests.some((interest) => interest.toLowerCase().includes(needle));
+        member.interests.some((interest) => interest.toLowerCase().includes(needle)) ||
+        member.achievements.some((achievement) => (
+          achievement.projectName.toLowerCase().includes(needle) ||
+          achievement.award.toLowerCase().includes(needle) ||
+          achievement.research.toLowerCase().includes(needle)
+        ));
 
       const matchesFilters = filters.every((filter) => member.interests.includes(filter));
       return matchesQuery && matchesFilters;

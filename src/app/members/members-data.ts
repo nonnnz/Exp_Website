@@ -5,6 +5,12 @@ export type MemberRole = {
   th: string;
 };
 
+export type MemberAchievement = {
+  projectName: string;
+  award: string;
+  research: string;
+};
+
 export type Member = {
   id: string;
   timestamp?: string;
@@ -21,6 +27,7 @@ export type Member = {
   photoUrl?: string;
   cvUrl?: string;
   videoUrl?: string;
+  achievements: MemberAchievement[];
 };
 
 export const INTEREST_DEFS: Record<
@@ -47,6 +54,8 @@ export const INTEREST_DEFS: Record<
 const SHEET_ID = "1OTDJzXn-x7Zj3XdIeyiM3iDefNhpXMv1S_XaOCQlbYA";
 const SHEET_GID = "1842186075";
 const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+const AWARDS_SHEET_NAME = "รางวัล/ผลงาน";
+const AWARDS_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(AWARDS_SHEET_NAME)}`;
 
 const HEADERS = {
   timestamp: "ประทับเวลา",
@@ -59,6 +68,13 @@ const HEADERS = {
   interests: "ความสนใจด้าน AI ให้ตอบและเว้นวรรคด้วยเครื่องหมายลูกน้ำ (,) เช่น RAG, NLP",
   cvUrl: "CV (ตั้งชื่อไฟล์เป็นรหัสประจำตัวโครงการ Super AI)",
   videoUrl: "link คลิปวิดีโอที่ส่งตอนสมัครโครงการ Super AI",
+};
+
+const AWARDS_HEADERS = {
+  id: "ชื่อไฟล์ / รหัสโครงการ",
+  projectName: "ชื่อโครงการ",
+  award: "รางวัล / เหรียญ",
+  research: "ผลงานเด่น / Research",
 };
 
 function parseCsv(csv: string): string[][] {
@@ -108,6 +124,18 @@ function parseCsv(csv: string): string[][] {
 
 function getCell(row: Record<string, string>, header: string) {
   return (row[header] ?? "").trim();
+}
+
+function cleanOptionalCell(value: string) {
+  const trimmed = value.trim();
+  return trimmed === "-" ? "" : trimmed;
+}
+
+function normalizeProjectId(value: string) {
+  return value
+    .trim()
+    .replace(/\.pdf$/i, "")
+    .replace(/[^\dA-Za-z_-]/g, "");
 }
 
 function splitInterests(value: string): string[] {
@@ -170,29 +198,72 @@ function rowToMember(row: Record<string, string>, index: number): Member | null 
     initials: makeInitials(nameTh, nameEn, displayId),
     cvUrl: getCell(row, HEADERS.cvUrl),
     videoUrl: getCell(row, HEADERS.videoUrl),
+    achievements: [],
   };
+}
+
+async function fetchCsv(url: string) {
+  const response = await fetch(url, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Google Sheets request failed: ${response.status}`);
+  }
+
+  return response.text();
+}
+
+function csvToRows(csv: string) {
+  const [headerRow, ...dataRows] = parseCsv(csv);
+  const headers = (headerRow ?? []).map((header) => header.trim());
+
+  return dataRows.map((cells) => (
+    Object.fromEntries(headers.map((header, cellIndex) => [header, cells[cellIndex] ?? ""]))
+  ));
+}
+
+async function getAchievementsByMemberId(): Promise<Record<string, MemberAchievement[]>> {
+  try {
+    const rows = csvToRows(await fetchCsv(AWARDS_CSV_URL));
+
+    return rows.reduce<Record<string, MemberAchievement[]>>((acc, row) => {
+      const memberId = normalizeProjectId(getCell(row, AWARDS_HEADERS.id));
+      if (!memberId) return acc;
+
+      const achievement = {
+        projectName: cleanOptionalCell(getCell(row, AWARDS_HEADERS.projectName)),
+        award: cleanOptionalCell(getCell(row, AWARDS_HEADERS.award)),
+        research: cleanOptionalCell(getCell(row, AWARDS_HEADERS.research)),
+      };
+
+      if (!achievement.projectName && !achievement.award && !achievement.research) return acc;
+
+      acc[memberId] = [...(acc[memberId] ?? []), achievement];
+      return acc;
+    }, {});
+  } catch (error) {
+    console.error(error);
+    return {};
+  }
 }
 
 export async function getMembers(): Promise<Member[]> {
   try {
-    const response = await fetch(SHEET_CSV_URL, {
-      cache: "no-store",
-    });
+    const [memberRows, achievementsByMemberId] = await Promise.all([
+      fetchCsv(SHEET_CSV_URL).then(csvToRows),
+      getAchievementsByMemberId(),
+    ]);
 
-    if (!response.ok) {
-      throw new Error(`Google Sheets request failed: ${response.status}`);
-    }
-
-    const csv = await response.text();
-    const [headerRow, ...dataRows] = parseCsv(csv);
-    const headers = headerRow.map((header) => header.trim());
-
-    return dataRows
-      .map((cells, index) => {
-        const row = Object.fromEntries(headers.map((header, cellIndex) => [header, cells[cellIndex] ?? ""]));
+    return memberRows
+      .map((row, index) => {
         return rowToMember(row, index);
       })
-      .filter((member): member is Member => member !== null);
+      .filter((member): member is Member => member !== null)
+      .map((member) => ({
+        ...member,
+        achievements: achievementsByMemberId[normalizeProjectId(member.id)] ?? [],
+      }));
   } catch (error) {
     console.error(error);
     return [];
