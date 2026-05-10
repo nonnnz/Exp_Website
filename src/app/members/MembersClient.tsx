@@ -253,7 +253,7 @@ export default function MembersClient({ members }: { members: Member[] }) {
             Members
           </h1>
           <p className="mx-auto mt-4 max-w-2xl font-mono text-sm uppercase text-space-cream/60 md:text-base">
-            Team member profiles pulled from the Super AI Google Sheet.
+            Say hello to the space crew powering the EXP universe
           </p>
         </div>
       </section>
