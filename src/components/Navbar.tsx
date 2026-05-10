@@ -19,8 +19,8 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 py-4">
       <div className="max-w-[1831px] mx-auto flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="font-anton text-base uppercase tracking-wider text-accent">
-          Portfolio
+        <Link href="/" className="flex items-center">
+          <img src="/EXP_LOGO_v4.png" alt="EXP Logo" className="h-14" />
         </Link>
 
         {/* Desktop Navigation - Liquid Glass */}
