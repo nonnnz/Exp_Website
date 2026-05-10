@@ -22,6 +22,8 @@ function latLngToVector3(lat: number, lng: number, radius: number): [number, num
   return [x, y, z];
 }
 
+const THAI_FONT_URL = "/IBMPlexSansThai-Regular.woff";
+
 function CommentPin({ text, author, position }: { text: string; author: string; position: [number, number, number] }) {
   return (
     <group position={position}>
@@ -36,6 +38,7 @@ function CommentPin({ text, author, position }: { text: string; author: string; 
         anchorX="center"
         anchorY="bottom"
         maxWidth={0.8}
+        font={THAI_FONT_URL}
       >
         {text}
       </Text>
@@ -45,6 +48,7 @@ function CommentPin({ text, author, position }: { text: string; author: string; 
         color="#FFA630"
         anchorX="center"
         anchorY="bottom"
+        font={THAI_FONT_URL}
       >
         {`— ${author}`}
       </Text>

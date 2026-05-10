@@ -64,9 +64,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== SECTION 2: ABOUT / INTRO ===== */}
-      <section className="relative min-h-screen flex items-center">
-        {/* Background */}
+      {/* ===== SECTION 2: ABOUT / INTRO (hidden) ===== */}
+      {/* <section className="relative min-h-screen flex items-center">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-tl from-[#1a0a3e]/50 via-space-bg to-[#0B3D91]/30" />
           <div className="stars-layer absolute inset-0 opacity-50" />
@@ -74,7 +73,6 @@ export default function HomePage() {
         </div>
 
         <div className="relative z-10 max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8 w-full py-16 md:py-24">
-          {/* Top Row */}
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-20">
             <div className="relative">
               <h2 className="font-anton text-[32px] sm:text-[48px] md:text-[60px] uppercase leading-[1.1]">
@@ -90,7 +88,6 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Bottom decorative text */}
           <div className="flex justify-between">
             <p className="font-mono text-sm uppercase text-space-cream/10 max-w-[300px] leading-relaxed">
               A dedicated team pushing beyond limits. An exploration of excellence, innovation, and collaboration in every mission.
@@ -100,7 +97,7 @@ export default function HomePage() {
             </p>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ===== SECTION 3: COLLECTION GRID ===== */}
       <section className="relative py-16 md:py-24">

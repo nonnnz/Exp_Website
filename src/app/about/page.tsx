@@ -24,30 +24,72 @@ interface Comment {
   lng: number;
 }
 
-const defaultComments: Comment[] = [
-  { id: 1, text: "Great team!", author: "Visitor", lat: 30, lng: 45 },
-  { id: 2, text: "Amazing work", author: "Guest", lat: -20, lng: 120 },
-  { id: 3, text: "Keep it up!", author: "Fan", lat: 50, lng: -60 },
-  { id: 4, text: "Inspiring", author: "Student", lat: -40, lng: -150 },
-  { id: 5, text: "Love this project", author: "Supporter", lat: 10, lng: 170 },
-];
+const SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/1bWBUzCCMMToH-9TYQ4dqkW0L59QtJ0z98lZ7dY9iE90/export?format=csv";
+
+function parseCsvRow(row: string): string[] {
+  const cells: string[] = [];
+  let value = "";
+  let inQuotes = false;
+  for (let i = 0; i < row.length; i++) {
+    const c = row[i];
+    const n = row[i + 1];
+    if (c === '"' && inQuotes && n === '"') { value += '"'; i++; continue; }
+    if (c === '"') { inQuotes = !inQuotes; continue; }
+    if (c === ',' && !inQuotes) { cells.push(value); value = ''; continue; }
+    value += c;
+  }
+  cells.push(value);
+  return cells;
+}
+
+async function fetchSheetComments(): Promise<Comment[]> {
+  const res = await fetch(SHEET_URL);
+  if (!res.ok) return [];
+  const csv = await res.text();
+  const lines = csv.split(/\r?\n/).filter((l) => l.trim());
+  if (lines.length < 2) return [];
+
+  const headers = parseCsvRow(lines[0]);
+  const nameIdx = headers.findIndex((h) => h.includes("Name"));
+  const feelingIdx = headers.findIndex((h) => h.includes("feeling"));
+
+  if (nameIdx === -1 || feelingIdx === -1) return [];
+
+  return lines.slice(1).map((line, i) => {
+    const cells = parseCsvRow(line);
+    return {
+      id: i + 1,
+      text: (cells[feelingIdx] || "").trim().slice(0, 60),
+      author: (cells[nameIdx] || "Anonymous").trim(),
+      lat: Math.random() * 140 - 70,
+      lng: Math.random() * 360 - 180,
+    };
+  }).filter((c) => c.text.length > 0);
+}
 
 export default function AboutPage() {
-  const [comments, setComments] = useState<Comment[]>(defaultComments);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [newText, setNewText] = useState("");
   const [newAuthor, setNewAuthor] = useState("");
 
-  // Load comments from localStorage
+  // Load comments from Google Sheet
   useEffect(() => {
-    const saved = localStorage.getItem("planet-comments");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setComments([...defaultComments, ...parsed]);
-      } catch {
-        // ignore parse errors
+    fetchSheetComments().then((sheetComments) => {
+      if (sheetComments.length > 0) {
+        setComments(sheetComments);
       }
-    }
+      // Also merge any local comments from localStorage
+      const saved = localStorage.getItem("planet-comments");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setComments((prev) => [...prev, ...parsed]);
+        } catch {
+          // ignore parse errors
+        }
+      }
+    });
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -62,12 +104,10 @@ export default function AboutPage() {
       lng: Math.random() * 360 - 180,
     };
 
-    const userComments = comments.filter(
-      (c) => !defaultComments.find((d) => d.id === c.id)
-    );
+    const userComments = JSON.parse(localStorage.getItem("planet-comments") || "[]");
     const updated = [...userComments, comment];
     localStorage.setItem("planet-comments", JSON.stringify(updated));
-    setComments([...defaultComments, ...updated]);
+    setComments((prev) => [...prev, comment]);
     setNewText("");
     setNewAuthor("");
   };
