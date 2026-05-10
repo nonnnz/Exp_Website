@@ -245,7 +245,7 @@ export default function ClipPage() {
           };
         }));
 
-        setClips(parsedClips.filter((c): c is NonNullable<typeof c> => c !== null));
+        setClips(parsedClips.filter(c => c !== null) as Clip[]);
       } catch (error) {
         console.error("Error loading clips:", error);
       } finally {
