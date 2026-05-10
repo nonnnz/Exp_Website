@@ -1,10 +1,11 @@
 {
+  "/_global-error/page": "app/_global-error/page.js",
   "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/members/page": "app/members/page.js",
-  "/clip/page": "app/clip/page.js",
   "/about/page": "app/about/page.js",
+  "/clip/page": "app/clip/page.js",
   "/gallery/page": "app/gallery/page.js",
-  "/recognition/page": "app/recognition/page.js",
-  "/other/page": "app/other/page.js"
+  "/members/page": "app/members/page.js",
+  "/other/page": "app/other/page.js",
+  "/page": "app/page.js",
+  "/recognition/page": "app/recognition/page.js"
 }
