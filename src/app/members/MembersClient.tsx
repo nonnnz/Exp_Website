@@ -242,6 +242,9 @@ export default function MembersClient({ members }: { members: Member[] }) {
           <h1 className="font-anton text-[40px] uppercase leading-none sm:text-[60px] md:text-[75px]">
             Members
           </h1>
+          <p className="font-mono text-sm md:text-base uppercase text-space-cream/60 max-w-2xl mx-auto mt-4">
+            Say hello to the space crew powering the EXP universe
+          </p>
         </div>
       </section>
 
