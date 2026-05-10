@@ -1,5 +1,15 @@
 {
   "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
     "x-next-cache-tags": "_N_T_/layout,_N_T_/clip/layout,_N_T_/clip/page,_N_T_/clip"
-  }
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/clip/__PAGE__",
+    "/clip",
+    "/_index",
+    "/_head"
+  ]
 }
