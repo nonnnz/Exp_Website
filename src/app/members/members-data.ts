@@ -176,7 +176,7 @@ function rowToMember(row: Record<string, string>, index: number): Member | null 
 export async function getMembers(): Promise<Member[]> {
   try {
     const response = await fetch(SHEET_CSV_URL, {
-      next: { revalidate: 300 },
+      cache: "no-store",
     });
 
     if (!response.ok) {
