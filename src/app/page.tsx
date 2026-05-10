@@ -12,7 +12,7 @@ export default function HomePage() {
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
           >
-            <source src="/motto.mp4" type="video/mp4" />
+            <source src="/ผมเจนซีขอเฟี้ยวๆ.mp4" type="video/mp4" />
           </video>
           {/* Dark overlay for readability */}
           <div className="absolute inset-0 bg-space-bg/40" />
@@ -36,14 +36,14 @@ export default function HomePage() {
         <div className="relative z-10 max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-[780px] lg:ml-32">
             <h1 className="font-anton text-[40px] sm:text-[60px] md:text-[75px] lg:text-[90px] uppercase leading-[1.05] md:leading-[1]">
-              Beyond earth<br />
-              and <span className="text-accent">(</span> its <span className="text-accent">)</span> familiar<br />
-              boundaries
+              EXP<br />
+              Experientia Docet<br />
+              Where our crew learns by doing
             </h1>
             {/* Cursive accent */}
             <div className="relative">
               <span className="font-cursive text-accent text-2xl sm:text-3xl md:text-4xl lg:text-5xl absolute -top-16 sm:-top-20 md:-top-24 right-0 lg:right-[-80px] -rotate-1 opacity-90 mix-blend-exclusion">
-                Our Portfolio
+                EXP forever
               </span>
             </div>
           </div>
@@ -64,40 +64,30 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== SECTION 2: ABOUT / INTRO (hidden) ===== */}
-      {/* <section className="relative min-h-screen flex items-center">
+      {/* ===== SECTION 2: GAME ===== */}
+      <section className="relative min-h-[60vh] flex items-center">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-tl from-[#1a0a3e]/50 via-space-bg to-[#0B3D91]/30" />
           <div className="stars-layer absolute inset-0 opacity-50" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]" />
         </div>
 
-        <div className="relative z-10 max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8 w-full py-16 md:py-24">
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-20">
-            <div className="relative">
-              <h2 className="font-anton text-[32px] sm:text-[48px] md:text-[60px] uppercase leading-[1.1]">
-                Hello!<br />
-                I&apos;m <span className="text-accent">Portfolio</span>
-              </h2>
-              <span className="font-cursive text-accent text-[36px] sm:text-[50px] md:text-[68px] absolute bottom-0 right-0 lg:right-[-60px] -rotate-1 opacity-90 mix-blend-exclusion">
-                Team
-              </span>
-            </div>
-            <p className="font-mono text-sm md:text-base uppercase max-w-[266px] text-space-cream/80 leading-relaxed">
-              A dedicated team pushing beyond limits. An exploration of excellence, innovation, and collaboration in every mission.
-            </p>
-          </div>
-
-          <div className="flex justify-between">
-            <p className="font-mono text-sm uppercase text-space-cream/10 max-w-[300px] leading-relaxed">
-              A dedicated team pushing beyond limits. An exploration of excellence, innovation, and collaboration in every mission.
-            </p>
-            <p className="font-mono text-sm uppercase text-space-cream/10 max-w-[300px] leading-relaxed hidden lg:block">
-              A dedicated team pushing beyond limits. An exploration of excellence, innovation, and collaboration in every mission.
-            </p>
-          </div>
+        <div className="relative z-10 max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8 w-full py-16 md:py-24 text-center">
+          <h2 className="font-anton text-[32px] sm:text-[48px] md:text-[60px] uppercase leading-[1.1] mb-6">
+            EXP67 <span className="text-accent">Game</span>
+          </h2>
+          <p className="font-mono text-sm md:text-base uppercase text-space-cream/70 max-w-xl mx-auto mb-10">
+            เกมออกกำลังกายด้วย AI — สลับแขนซ้าย-ขวาให้เร็วที่สุด เก็บ EXP อัปขั้นนักพัฒนา AI
+          </p>
+          <a
+            href="/game"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-accent text-white font-anton text-lg uppercase rounded-full hover:bg-accent-dark transition-colors shadow-lg shadow-accent/30"
+          >
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+            เล่นเกม
+          </a>
         </div>
-      </section> */}
+      </section>
 
       {/* ===== SECTION 3: COLLECTION GRID ===== */}
       <section className="relative py-16 md:py-24">
