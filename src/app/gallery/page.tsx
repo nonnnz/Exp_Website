@@ -1,190 +1,168 @@
 "use client";
 
 import Footer from "@/components/Footer";
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useState, useRef, type PointerEvent } from "react";
 
-type DriveImage = {
-  id: string;
-  name: string;
-  src: string;
-  createdTime: string;
-};
+type Img = { id: string; name: string; src: string; createdTime: string };
 
-/* ─────────────────────────────────────────────
-   Intersection-observer hook for scroll reveal
-───────────────────────────────────────────── */
-function useScrollReveal(threshold = 0.12) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
+function useColumns() {
+  const [cols, setCols] = useState(4);
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return { ref, visible };
+    const update = () => {
+      if (window.innerWidth < 640) setCols(2);
+      else if (window.innerWidth < 1024) setCols(3);
+      else setCols(4);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return cols;
 }
 
 export default function GalleryPage() {
-  const [images, setImages] = useState<DriveImage[]>([]);
+  const [images, setImages] = useState<Img[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const cols = useColumns();
 
   useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        setIsLoading(true);
-        const res = await fetch("/api/drive-images");
-        if (!res.ok) throw new Error(`API error: ${res.status}`);
-        const data = await res.json();
-        setImages(data.images ?? []);
-      } catch (err) {
-        console.error("Failed to fetch gallery:", err);
-        setHasError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchImages();
+    fetch("/api/drive-images")
+      .then((r) => { if (!r.ok) throw new Error("fail"); return r.json(); })
+      .then((d) => setImages(d.images ?? []))
+      .catch(() => setHasError(true))
+      .finally(() => setIsLoading(false));
   }, []);
 
-  const openImage = useCallback((index: number) => {
-    setSelectedIndex(index);
+  const open = useCallback((i: number) => {
+    setLightboxIndex(i);
     document.body.style.overflow = "hidden";
   }, []);
-
-  const closeModal = useCallback(() => {
-    setSelectedIndex(null);
+  const close = useCallback(() => {
+    setLightboxIndex(null);
     document.body.style.overflow = "";
   }, []);
-
-  const goNext = useCallback(() => {
-    if (images.length === 0 || selectedIndex === null) return;
-    setSelectedIndex((selectedIndex + 1) % images.length);
-  }, [images.length, selectedIndex]);
-
-  const goPrev = useCallback(() => {
-    if (images.length === 0 || selectedIndex === null) return;
-    setSelectedIndex((selectedIndex - 1 + images.length) % images.length);
-  }, [images.length, selectedIndex]);
+  const goNext = useCallback(() => setLightboxIndex((i) => i === null ? null : (i + 1) % images.length), [images.length]);
+  const goPrev = useCallback(() => setLightboxIndex((i) => i === null ? null : (i - 1 + images.length) % images.length), [images.length]);
 
   useEffect(() => {
-    if (selectedIndex === null) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeModal();
+    if (lightboxIndex === null) return;
+    const h = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
       if (e.key === "ArrowRight") goNext();
       if (e.key === "ArrowLeft") goPrev();
     };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [selectedIndex, closeModal, goNext, goPrev]);
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [lightboxIndex, close, goNext, goPrev]);
 
-  const selectedImage = selectedIndex !== null ? images[selectedIndex] : null;
-  const isAnyHovered = hoveredId !== null;
+  // Chunk into rows
+  const rows: Img[][] = [];
+  for (let i = 0; i < images.length; i += cols) rows.push(images.slice(i, i + cols));
+
+  const ROW_H = typeof window !== "undefined" && window.innerWidth < 640 ? 160 : typeof window !== "undefined" && window.innerWidth < 1024 ? 220 : 280;
 
   return (
     <div className="min-h-screen bg-space-bg text-space-cream">
-      {/* ── Hero ── */}
-      <section className="relative flex min-h-[28vh] items-end overflow-hidden rounded-b-[32px] pb-12 pt-24">
+      {/* Hero */}
+      <section className="relative flex min-h-[24vh] items-end overflow-hidden rounded-b-[32px] pb-10 pt-24">
         <div className="absolute inset-0 bg-gradient-to-t from-space-bg via-primary/20 to-space-bg" />
         <div className="absolute inset-0 stars-layer opacity-40" />
-        <div className="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-[120px]" />
-
+        <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-[120px]" />
         <div className="relative z-10 mx-auto w-full max-w-[1831px] px-4 sm:px-6 lg:px-8">
           <p className="font-mono text-xs uppercase tracking-[0.35em] text-accent/90">Visual Archive</p>
-          <div className="mt-3 flex items-end justify-between gap-6">
-            <h1 className="font-anton text-[40px] uppercase leading-none sm:text-[60px] md:text-[75px]">
-              Gallery
-            </h1>
+          <div className="mt-3 flex items-end justify-between">
+            <h1 className="font-anton text-[40px] uppercase leading-none sm:text-[60px] md:text-[75px]">Gallery</h1>
             {!isLoading && !hasError && (
-              <p className="mb-2 font-mono text-xs uppercase tracking-wider text-space-cream/40">
-                {images.length} images
-              </p>
+              <p className="mb-1 font-mono text-xs uppercase text-space-cream/40">{images.length} images</p>
             )}
           </div>
         </div>
       </section>
 
-      {/* ── Gallery ── */}
-      <section className="mx-auto max-w-[1831px] px-3 py-10 sm:px-4 lg:px-6">
-        {/* Inject global transition for the hover scale effect */}
-        <style>{`
-          .gallery-item {
-            transition:
-              transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1),
-              opacity 0.3s ease,
-              filter 0.3s ease,
-              box-shadow 0.3s ease;
-            will-change: transform, opacity;
-          }
-          .gallery-item.is-hovered {
-            transform: scale(1.03);
-            opacity: 1;
-            filter: none;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.07);
-            z-index: 20;
-          }
-          .gallery-item.is-dimmed {
-            transform: scale(1);
-            opacity: 0.4;
-            filter: brightness(0.65) saturate(0.6);
-            z-index: 0;
-          }
-          @media (min-width: 640px)  { .masonry { column-count: 3; } }
-          @media (min-width: 1024px) { .masonry { column-count: 4; } }
-          @media (min-width: 1280px) { .masonry { column-count: 5; } }
-
-          /* Scroll-reveal */
-          .reveal-item {
-            opacity: 0;
-            transform: translateY(28px) scale(0.97);
-            transition:
-              opacity 0.6s ease,
-              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-          }
-          .reveal-item.revealed {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        `}</style>
-
+      {/* Grid */}
+      <section className="mx-auto max-w-[1831px] px-3 py-8 sm:px-4 lg:px-6">
         {isLoading ? (
-          <SkeletonMasonry />
+          <div className="flex flex-col gap-2">
+            {[280, 240, 260].map((h, i) => (
+              <div key={i} className="flex gap-2">
+                {Array.from({ length: cols }).map((_, j) => (
+                  <div key={j} className="animate-pulse rounded-[12px] bg-white/8 flex-1" style={{ height: h }} />
+                ))}
+              </div>
+            ))}
+          </div>
         ) : hasError ? (
-          <ErrorState onRetry={() => window.location.reload()} />
-        ) : images.length === 0 ? (
-          <EmptyState />
+          <div className="flex flex-col items-center py-32">
+            <p className="font-mono text-sm uppercase text-space-cream/50">Failed to load images.</p>
+            <button onClick={() => window.location.reload()} className="mt-6 liquid-glass min-h-11 rounded-[28px] px-5 py-3 font-anton text-xs uppercase text-space-cream hover:text-accent">
+              Retry
+            </button>
+          </div>
         ) : (
-          <MasonryGallery
-            images={images}
-            hoveredId={hoveredId}
-            isAnyHovered={isAnyHovered}
-            onHover={setHoveredId}
-            onOpen={openImage}
-          />
+          <div className="flex flex-col gap-2">
+            {rows.map((row, ri) => (
+              <div key={ri} className="flex gap-2" style={{ height: ROW_H }}>
+                {row.map((img, ci) => {
+                  const globalIdx = ri * cols + ci;
+                  const isHov = hoveredId === img.id;
+                  const isDim = hoveredId !== null && !isHov;
+                  return (
+                    <button
+                      key={img.id}
+                      type="button"
+                      aria-label={`View image ${globalIdx + 1}`}
+                      onClick={() => open(globalIdx)}
+                      onMouseEnter={() => setHoveredId(img.id)}
+                      onMouseLeave={() => setHoveredId(null)}
+                      style={{
+                        flexGrow: isHov ? 2 : 1,
+                        flexShrink: 1,
+                        flexBasis: 0,
+                        minWidth: 0,
+                        height: "100%",
+                        transition: "flex-grow 0.42s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, filter 0.3s ease",
+                        overflow: "hidden",
+                        borderRadius: 12,
+                        opacity: isDim ? 0.45 : 1,
+                        filter: isDim ? "brightness(0.6) saturate(0.5)" : "none",
+                        outline: "none",
+                        cursor: "zoom-in",
+                        position: "relative",
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={img.src}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          display: "block",
+                          transform: isHov ? "scale(1.04)" : "scale(1)",
+                          transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                        }}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         )}
       </section>
 
-      {/* ── Lightbox ── */}
-      {selectedImage && selectedIndex !== null && (
+      {lightboxIndex !== null && images[lightboxIndex] && (
         <Lightbox
-          image={selectedImage}
-          index={selectedIndex}
+          image={images[lightboxIndex]}
+          index={lightboxIndex}
           total={images.length}
-          onClose={closeModal}
+          onClose={close}
           onNext={goNext}
           onPrev={goPrev}
         />
@@ -195,173 +173,47 @@ export default function GalleryPage() {
   );
 }
 
-/* ─────────────────────────────────────────────
-   Masonry gallery with hover spotlight
-───────────────────────────────────────────── */
-function MasonryGallery({
-  images,
-  hoveredId,
-  isAnyHovered,
-  onHover,
-  onOpen,
-}: {
-  images: DriveImage[];
-  hoveredId: string | null;
-  isAnyHovered: boolean;
-  onHover: (id: string | null) => void;
-  onOpen: (index: number) => void;
-}) {
-  const { ref, visible } = useScrollReveal();
-
-  return (
-    <div ref={ref} className="masonry" style={{ columnCount: 2, columnGap: "12px" }}>
-      {images.map((img, index) => {
-        const isHovered = hoveredId === img.id;
-        const isDimmed = isAnyHovered && !isHovered;
-
-        return (
-          <div
-            key={img.id}
-            className={`relative mb-3 overflow-hidden rounded-[16px] gallery-item reveal-item ${
-              visible ? `revealed` : ""
-            } ${isHovered ? "is-hovered" : ""} ${isDimmed ? "is-dimmed" : ""}`}
-            style={{
-              breakInside: "avoid",
-              transitionDelay: visible ? `${Math.min(index * 40, 600)}ms` : "0ms",
-              position: "relative",
-            }}
-            onMouseEnter={() => onHover(img.id)}
-            onMouseLeave={() => onHover(null)}
-          >
-            <button
-              type="button"
-              onClick={() => onOpen(index)}
-              aria-label={`View image ${index + 1}`}
-              className="block w-full cursor-zoom-in focus:outline-none"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={img.src}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                className="block h-auto w-full"
-              />
-            </button>
-
-            {/* Subtle accent shine on hover */}
-            <div
-              className="pointer-events-none absolute inset-0 rounded-[16px] opacity-0 transition-opacity duration-300"
-              style={{
-                opacity: isHovered ? 1 : 0,
-                background:
-                  "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%)",
-              }}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   Lightbox with zoom + pan
-───────────────────────────────────────────── */
-function Lightbox({
-  image,
-  index,
-  total,
-  onClose,
-  onNext,
-  onPrev,
-}: {
-  image: DriveImage;
-  index: number;
-  total: number;
-  onClose: () => void;
-  onNext: () => void;
-  onPrev: () => void;
+function Lightbox({ image, index, total, onClose, onNext, onPrev }: {
+  image: Img; index: number; total: number;
+  onClose: () => void; onNext: () => void; onPrev: () => void;
 }) {
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const dragState = useRef<{
-    pointerId: number;
-    startX: number;
-    startY: number;
-    originX: number;
-    originY: number;
-  } | null>(null);
+  const drag = useRef<{ pid: number; sx: number; sy: number; ox: number; oy: number } | null>(null);
 
-  useEffect(() => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-    dragState.current = null;
-  }, [image.id]);
+  useEffect(() => { setZoom(1); setPan({ x: 0, y: 0 }); }, [image.id]);
 
-  const setViewerZoom = (nextZoom: number) => {
-    const clamped = Math.min(5, Math.max(0.5, Math.round(nextZoom * 100) / 100));
-    setZoom(clamped);
-    if (clamped <= 1) setPan({ x: 0, y: 0 });
+  const setZ = (z: number) => {
+    const c = Math.min(5, Math.max(0.5, Math.round(z * 100) / 100));
+    setZoom(c);
+    if (c <= 1) setPan({ x: 0, y: 0 });
   };
 
-  const onWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    setViewerZoom(zoom + (e.deltaY < 0 ? 0.15 : -0.15));
-  };
-
-  const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
+  const onWheel = (e: React.WheelEvent) => { e.preventDefault(); setZ(zoom + (e.deltaY < 0 ? 0.15 : -0.15)); };
+  const onPD = (e: PointerEvent<HTMLDivElement>) => {
     if (zoom <= 1) return;
     e.currentTarget.setPointerCapture(e.pointerId);
-    dragState.current = {
-      pointerId: e.pointerId,
-      startX: e.clientX,
-      startY: e.clientY,
-      originX: pan.x,
-      originY: pan.y,
-    };
+    drag.current = { pid: e.pointerId, sx: e.clientX, sy: e.clientY, ox: pan.x, oy: pan.y };
   };
-
-  const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    const drag = dragState.current;
-    if (!drag || drag.pointerId !== e.pointerId) return;
-    setPan({ x: drag.originX + e.clientX - drag.startX, y: drag.originY + e.clientY - drag.startY });
+  const onPM = (e: PointerEvent<HTMLDivElement>) => {
+    if (!drag.current || drag.current.pid !== e.pointerId) return;
+    setPan({ x: drag.current.ox + e.clientX - drag.current.sx, y: drag.current.oy + e.clientY - drag.current.sy });
   };
-
-  const onPointerEnd = (e: PointerEvent<HTMLDivElement>) => {
-    if (dragState.current?.pointerId === e.pointerId) dragState.current = null;
-  };
+  const onPE = (e: PointerEvent<HTMLDivElement>) => { if (drag.current?.pid === e.pointerId) drag.current = null; };
 
   return (
-    <div
-      className="fixed inset-0 z-[90] flex items-center justify-center bg-black/92"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Image viewer"
-      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      {/* Image area */}
+    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/92"
+      role="dialog" aria-modal="true"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div
-        className={`relative flex h-full w-full select-none items-center justify-center overflow-hidden ${
-          zoom > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-out"
-        }`}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerEnd}
-        onPointerCancel={onPointerEnd}
-        onWheel={onWheel}
+        className={`relative flex h-full w-full select-none items-center justify-center overflow-hidden ${zoom > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-out"}`}
+        onPointerDown={onPD} onPointerMove={onPM} onPointerUp={onPE} onPointerCancel={onPE} onWheel={onWheel}
         onClick={(e) => { if (e.target === e.currentTarget && zoom <= 1) onClose(); }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={image.src}
-          alt=""
-          draggable={false}
+        <img src={image.src} alt="" draggable={false}
           className="max-h-[90vh] max-w-[90vw] rounded-[8px] object-contain shadow-2xl"
-          style={{
-            transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
-            transition: dragState.current ? "none" : "transform 0.2s ease-out",
-          }}
+          style={{ transform: `translate3d(${pan.x}px,${pan.y}px,0) scale(${zoom})`, transition: drag.current ? "none" : "transform 0.2s ease-out" }}
         />
       </div>
 
@@ -372,123 +224,30 @@ function Lightbox({
         </span>
         <div className="pointer-events-auto flex items-center gap-2">
           <div className="flex items-center gap-1 rounded-full bg-black/50 p-1.5 backdrop-blur">
-            <button
-              type="button"
-              onClick={() => setViewerZoom(zoom - 0.25)}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white focus:outline-none"
-              aria-label="Zoom out"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0zm-6 0H8" />
-              </svg>
+            <button onClick={() => setZ(zoom - 0.25)} className="flex h-9 w-9 items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white" aria-label="Zoom out">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0zm-6 0H8" /></svg>
             </button>
-            <button
-              type="button"
-              onClick={() => setViewerZoom(1)}
-              className="min-w-[44px] rounded-full px-2 py-1 font-mono text-[10px] uppercase text-white/60 transition-colors hover:text-white focus:outline-none"
-              aria-label="Reset zoom"
-            >
+            <button onClick={() => setZ(1)} className="min-w-[44px] rounded-full px-2 py-1 font-mono text-[10px] uppercase text-white/60 hover:text-white" aria-label="Reset zoom">
               {Math.round(zoom * 100)}%
             </button>
-            <button
-              type="button"
-              onClick={() => setViewerZoom(zoom + 0.25)}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white focus:outline-none"
-              aria-label="Zoom in"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0zm0-6v6m-3-3h6" />
-              </svg>
+            <button onClick={() => setZ(zoom + 0.25)} className="flex h-9 w-9 items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white" aria-label="Zoom in">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0zm0-6v6m-3-3h6" /></svg>
             </button>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white/70 backdrop-blur transition-colors hover:bg-white/15 hover:text-white focus:outline-none"
-            aria-label="Close viewer"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+          <button onClick={onClose} className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white/70 backdrop-blur hover:bg-white/15 hover:text-white" aria-label="Close">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
       </div>
 
-      {/* Prev / Next */}
-      {total > 1 && (
-        <>
-          <button
-            type="button"
-            onClick={onPrev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-black/50 text-white/70 backdrop-blur transition-colors hover:bg-white/15 hover:text-white focus:outline-none sm:left-5"
-            aria-label="Previous image"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={onNext}
-            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-black/50 text-white/70 backdrop-blur transition-colors hover:bg-white/15 hover:text-white focus:outline-none sm:right-5"
-            aria-label="Next image"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </>
-      )}
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   Skeleton
-───────────────────────────────────────────── */
-const SKELETON_HEIGHTS = [220, 310, 180, 260, 340, 200, 280, 220, 300, 190, 250, 320];
-
-function SkeletonMasonry() {
-  return (
-    <div className="masonry" style={{ columnCount: 2, columnGap: "12px" }}>
-      <style>{`
-        @media (min-width: 640px)  { .masonry { column-count: 3; } }
-        @media (min-width: 1024px) { .masonry { column-count: 4; } }
-        @media (min-width: 1280px) { .masonry { column-count: 5; } }
-      `}</style>
-      {SKELETON_HEIGHTS.map((h, i) => (
-        <div
-          key={i}
-          className="mb-3 animate-pulse rounded-[16px] bg-white/6"
-          style={{ height: h, breakInside: "avoid" }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function ErrorState({ onRetry }: { onRetry: () => void }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-32 text-center">
-      <p className="font-mono text-sm uppercase tracking-wider text-space-cream/50">
-        Signal lost — couldn&apos;t load images.
-      </p>
-      <button
-        onClick={onRetry}
-        className="mt-6 liquid-glass min-h-11 rounded-[28px] px-5 py-3 font-anton text-xs uppercase tracking-wide text-space-cream transition-colors hover:text-accent"
-      >
-        Retry
-      </button>
-    </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="flex flex-col items-center justify-center py-32 text-center">
-      <p className="font-mono text-sm uppercase tracking-wider text-space-cream/50">
-        No images found in archive.
-      </p>
+      {total > 1 && <>
+        <button onClick={onPrev} className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-black/50 text-white/70 backdrop-blur hover:bg-white/15 hover:text-white" aria-label="Previous">
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <button onClick={onNext} className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-black/50 text-white/70 backdrop-blur hover:bg-white/15 hover:text-white" aria-label="Next">
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </>}
     </div>
   );
 }
