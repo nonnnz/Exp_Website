@@ -51,8 +51,8 @@ const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export
 const HEADERS = {
   timestamp: "ประทับเวลา",
   id: "รหัสประจำตัวโครงการ",
-  nameTh: "ชื่อ นามสกุล (ไม่ต้องใส่คำนำหน้า)",
-  nameEn: "ชื่อ นามสกุล (ภาษาอังกฤษ) ไม่ต้องใส่คำนำหน้า",
+  nameTh: "ชื่อ ตามสกุล (ไม่ต้องใส่คำนำหน้า)",
+  nameEn: "ชื่อ ตามสกุล (ภาษาอังกฤษ) ไม่ต้องใส่คำนำหน้า",
   nicknameTh: "ชื่อเล่น",
   nicknameEn: "ชื่อเล่น (ภาษาอังกฤษ)",
   motto: "คติประจำตัว",
