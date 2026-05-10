@@ -58,23 +58,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== SECTION 2: INTRO ===== */}
-      <section className="relative min-h-screen flex items-center">
+      {/* ===== SECTION 2: GAME ===== */}
+      <section className="relative min-h-[60vh] flex items-center">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-tl from-[#1a0a3e]/50 via-space-bg to-[#0B3D91]/30" />
           <div className="stars-layer absolute inset-0 opacity-50" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]" />
         </div>
 
-        <div className="relative z-10 max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8 w-full py-16 md:py-24">
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-20">
-            <div className="relative">
-              <h2 className="font-anton text-[32px] sm:text-[48px] md:text-[60px] uppercase leading-[1.1]">
-                Gain EXP<br />
-                SIX <span className="text-accent">SEVEN</span>
-              </h2>
-            </div>
-          </div>
+        <div className="relative z-10 max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8 w-full py-16 md:py-24 text-center">
+          <h2 className="font-anton text-[32px] sm:text-[48px] md:text-[60px] uppercase leading-[1.1] mb-6">
+            Gain EXP<br />
+            SIX <span className="text-accent">SEVEN</span>
+          </h2>
+          <p className="font-mono text-sm md:text-base uppercase text-space-cream/70 max-w-xl mx-auto mb-10">
+            เกมออกกำลังกายด้วย AI — สลับแขนซ้าย-ขวาให้เร็วที่สุด เก็บ EXP อัปขั้นนักพัฒนา AI
+          </p>
+          <a
+            href="/game"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-accent text-white font-anton text-lg uppercase rounded-full hover:bg-accent-dark transition-colors shadow-lg shadow-accent/30"
+          >
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+            เล่นเกม
+          </a>
         </div>
       </section>
 
