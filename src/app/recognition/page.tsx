@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Footer from "@/components/Footer";
 
 const awards = [
-  { year: "2025", title: "Team website deployment", description: "Our team website has been created with Next.JS and deployed on Vercel. Hooray!", organization: "Super AI engineer season 6 Team EXP", type: "trophy" },
+  { year: "2026", title: "Team website deployment", description: "Our team website has been created with Next.JS and deployed on Vercel. Hooray!", organization: "Super AI engineer season 6 Team EXP", type: "trophy" },
 ];
 
 const icons: Record<string, React.ReactNode> = {
