@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}";
+self.__REACT_LOADABLE_MANIFEST="{\"..\\\\node_modules\\\\@react-three\\\\drei\\\\core\\\\FaceLandmarker.js -> @mediapipe/tasks-vision\":{\"id\":\"..\\\\node_modules\\\\@react-three\\\\drei\\\\core\\\\FaceLandmarker.js -> @mediapipe/tasks-vision\",\"files\":[]},\"app\\\\about\\\\page.tsx -> @/components/Planet\":{\"id\":\"app\\\\about\\\\page.tsx -> @/components/Planet\",\"files\":[\"static/chunks/_app-pages-browser_src_components_Planet_tsx.js\"]}}"

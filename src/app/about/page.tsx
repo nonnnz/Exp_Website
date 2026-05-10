@@ -1,41 +1,184 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import Footer from "@/components/Footer";
 
+const Planet = dynamic(() => import("@/components/Planet"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[500px] md:h-[600px] flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-2 border-accent/30 border-t-accent rounded-full animate-spin mx-auto mb-4" />
+        <p className="font-mono text-xs text-space-cream/50">Loading Planet...</p>
+      </div>
+    </div>
+  ),
+});
+
+interface Comment {
+  id: number;
+  text: string;
+  author: string;
+  lat: number;
+  lng: number;
+}
+
+const defaultComments: Comment[] = [
+  { id: 1, text: "Great team!", author: "Visitor", lat: 30, lng: 45 },
+  { id: 2, text: "Amazing work", author: "Guest", lat: -20, lng: 120 },
+  { id: 3, text: "Keep it up!", author: "Fan", lat: 50, lng: -60 },
+  { id: 4, text: "Inspiring", author: "Student", lat: -40, lng: -150 },
+  { id: 5, text: "Love this project", author: "Supporter", lat: 10, lng: 170 },
+];
+
 export default function AboutPage() {
+  const [comments, setComments] = useState<Comment[]>(defaultComments);
+  const [newText, setNewText] = useState("");
+  const [newAuthor, setNewAuthor] = useState("");
+
+  // Load comments from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("planet-comments");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setComments([...defaultComments, ...parsed]);
+      } catch {
+        // ignore parse errors
+      }
+    }
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newText.trim()) return;
+
+    const comment: Comment = {
+      id: Date.now(),
+      text: newText.trim().slice(0, 50),
+      author: newAuthor.trim() || "Anonymous",
+      lat: Math.random() * 140 - 70,
+      lng: Math.random() * 360 - 180,
+    };
+
+    const userComments = comments.filter(
+      (c) => !defaultComments.find((d) => d.id === c.id)
+    );
+    const updated = [...userComments, comment];
+    localStorage.setItem("planet-comments", JSON.stringify(updated));
+    setComments([...defaultComments, ...updated]);
+    setNewText("");
+    setNewAuthor("");
+  };
+
   return (
     <div className="bg-space-bg text-space-cream pt-20">
       {/* Header */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-16 overflow-hidden">
         <div className="absolute inset-0 stars-layer opacity-30" />
         <div className="relative max-w-[1831px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="font-anton text-[40px] sm:text-[60px] md:text-[75px] uppercase">About Us</h1>
+          <h1 className="font-anton text-[40px] sm:text-[60px] md:text-[75px] uppercase">
+            About Us
+          </h1>
           <p className="font-mono text-sm md:text-base uppercase text-space-cream/60 max-w-2xl mx-auto mt-4">
-            Learn more about who we are and what drives us forward.
+            Explore our planet — leave your mark in the universe.
           </p>
         </div>
       </section>
 
-      {/* Content */}
+      {/* Planet Section */}
+      <section className="relative py-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-6">
+            <p className="font-mono text-xs text-space-cream/50 uppercase tracking-wider">
+              Drag to rotate • Scroll to zoom • Comments appear on the planet
+            </p>
+          </div>
+          <Planet comments={comments} />
+        </div>
+      </section>
+
+      {/* Comment Form */}
+      <section className="py-12">
+        <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="liquid-glass rounded-2xl p-6">
+            <h3 className="font-anton text-xl uppercase mb-4 text-center">
+              Leave Your Mark
+            </h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="author" className="font-mono text-xs text-space-cream/60 uppercase block mb-1">
+                  Name
+                </label>
+                <input
+                  id="author"
+                  type="text"
+                  value={newAuthor}
+                  onChange={(e) => setNewAuthor(e.target.value)}
+                  placeholder="Anonymous"
+                  maxLength={20}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-space-cream placeholder-space-cream/30 focus:outline-none focus:border-accent/50 transition-colors"
+                />
+              </div>
+              <div>
+                <label htmlFor="comment" className="font-mono text-xs text-space-cream/60 uppercase block mb-1">
+                  Message (max 50 chars)
+                </label>
+                <input
+                  id="comment"
+                  type="text"
+                  value={newText}
+                  onChange={(e) => setNewText(e.target.value)}
+                  placeholder="Write something..."
+                  maxLength={50}
+                  required
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-space-cream placeholder-space-cream/30 focus:outline-none focus:border-accent/50 transition-colors"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-accent text-white font-anton uppercase text-sm py-3 rounded-lg hover:bg-accent-dark transition-colors"
+              >
+                Send to Planet
+              </button>
+            </form>
+            <p className="font-mono text-[10px] text-space-cream/40 text-center mt-3">
+              {comments.length} messages orbiting the planet
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* About Content */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-6">Our Story</h2>
+          <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-6">
+            Our Story
+          </h2>
           <p className="font-mono text-sm text-space-cream/70 mb-6 leading-relaxed">
-            We are a dedicated team committed to excellence in everything we do. 
-            Our journey began with a shared vision to create meaningful impact through 
-            collaboration, innovation, and hard work.
+            We are a dedicated team committed to excellence in everything we do.
+            Our journey began with a shared vision to create meaningful impact
+            through collaboration, innovation, and hard work.
           </p>
           <p className="font-mono text-sm text-space-cream/70 mb-12 leading-relaxed">
-            Over the years, we have grown both in numbers and in expertise, 
-            consistently pushing boundaries and setting new standards in our field.
+            Over the years, we have grown both in numbers and in expertise,
+            consistently pushing boundaries and setting new standards in our
+            field.
           </p>
 
-          <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-6">Our Mission</h2>
+          <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-6">
+            Our Mission
+          </h2>
           <p className="font-mono text-sm text-space-cream/70 mb-12 leading-relaxed">
-            To deliver outstanding results through teamwork, creativity, and a 
-            relentless pursuit of quality. We believe in empowering each member 
+            To deliver outstanding results through teamwork, creativity, and a
+            relentless pursuit of quality. We believe in empowering each member
             to reach their full potential.
           </p>
 
-          <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-8">Our Values</h2>
+          <h2 className="font-anton text-3xl md:text-4xl uppercase text-accent mb-8">
+            Our Values
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               { title: "Excellence", desc: "Striving for the highest quality in all our endeavors." },
