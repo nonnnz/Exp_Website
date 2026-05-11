@@ -57,7 +57,7 @@ npm run build
 npm start
 ```
 
-เปิด [http://localhost:3000](http://localhost:3000) เพื่อดูผลลัพธ์
+เปิด [https://exp-website-pink.vercel.app/](https://exp-website-pink.vercel.app/) เพื่อดูผลลัพธ์
 
 ## 📝 Notes
 
