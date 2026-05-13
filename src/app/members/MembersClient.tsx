@@ -190,7 +190,7 @@ function MemberModal({ member, onClose }: { member: Member; onClose: () => void 
             {member.achievements.length > 0 && (
               <section>
                 <p className="mb-4 font-anton text-2xl uppercase text-space-cream">Awards / Research</p>
-                <div className="space-y-3">
+                <div className="max-h-80 space-y-3 overflow-y-auto pr-2">
                   {member.achievements.map((achievement, index) => (
                     <div
                       key={`${achievement.projectName}-${achievement.award}-${achievement.research}-${index}`}
