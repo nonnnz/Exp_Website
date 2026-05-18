@@ -3,7 +3,24 @@
 import Footer from "@/components/Footer";
 import { useCallback, useEffect, useState, useRef, type PointerEvent } from "react";
 
-type Img = { id: string; name: string; src: string; createdTime: string };
+type Img = {
+  id: string;
+  name: string;
+  src: string;
+  createdTime: string;
+  caption?: string;
+  source?: "local" | "drive";
+};
+
+type GalleryMeta = {
+  localCount: number;
+  driveCount: number;
+  sheetUrl: string;
+  sheetError: string | null;
+  skippedRows: number;
+  sheetRowCount: number;
+  processedSheetRowCount: number;
+};
 
 function useColumns() {
   const [cols, setCols] = useState(4);
@@ -20,8 +37,35 @@ function useColumns() {
   return cols;
 }
 
+function smoothScrollToCenter(element: HTMLElement, duration: number = 700) {
+  const targetPosition = element.getBoundingClientRect().top + window.scrollY - window.innerHeight / 2 + element.offsetHeight / 2;
+  const startPosition = window.scrollY;
+  const distance = targetPosition - startPosition;
+  let startTime: number | null = null;
+
+  // Premium feeling ease-in-out cubic curve
+  function ease(t: number): number {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function animation(currentTime: number) {
+    if (startTime === null) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    const progress = Math.min(timeElapsed / duration, 1);
+
+    window.scrollTo(0, startPosition + distance * ease(progress));
+
+    if (timeElapsed < duration) {
+      requestAnimationFrame(animation);
+    }
+  }
+
+  requestAnimationFrame(animation);
+}
+
 export default function GalleryPage() {
   const [images, setImages] = useState<Img[]>([]);
+  const [meta, setMeta] = useState<GalleryMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
@@ -31,7 +75,10 @@ export default function GalleryPage() {
   useEffect(() => {
     fetch("/api/drive-images")
       .then((r) => { if (!r.ok) throw new Error("fail"); return r.json(); })
-      .then((d) => setImages(d.images ?? []))
+      .then((d) => {
+        setImages(d.images ?? []);
+        setMeta(d.meta ?? null);
+      })
       .catch(() => setHasError(true))
       .finally(() => setIsLoading(false));
   }, []);
@@ -58,6 +105,51 @@ export default function GalleryPage() {
     return () => window.removeEventListener("keydown", h);
   }, [lightboxIndex, close, goNext, goPrev]);
 
+  const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isScrolling = useRef(false);
+  const mousePos = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      mousePos.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener('mousemove', onMouseMove);
+    return () => window.removeEventListener('mousemove', onMouseMove);
+  }, []);
+
+  const handleMouseEnter = useCallback((idx: number, e: React.MouseEvent<HTMLButtonElement>) => {
+    if (isScrolling.current) return;
+    setHoveredIdx(idx);
+    const el = e.currentTarget;
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    scrollTimeout.current = setTimeout(() => {
+      isScrolling.current = true;
+      const scrollDuration = 700;
+      smoothScrollToCenter(el, scrollDuration);
+      
+      setTimeout(() => {
+        isScrolling.current = false;
+        const elemUnder = document.elementFromPoint(mousePos.current.x, mousePos.current.y);
+        if (elemUnder && !el.contains(elemUnder)) {
+          const button = elemUnder.closest('button[data-gallery-item]');
+          if (button) {
+            const newIdx = parseInt(button.getAttribute('data-idx') || '-1', 10);
+            if (newIdx >= 0) setHoveredIdx(newIdx);
+            else setHoveredIdx(null);
+          } else {
+            setHoveredIdx(null);
+          }
+        }
+      }, scrollDuration + 50);
+    }, 250);
+  }, []);
+
+  const handleMouseLeave = useCallback((idx: number) => {
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    if (isScrolling.current) return;
+    setHoveredIdx((currentIdx) => (currentIdx === idx ? null : currentIdx));
+  }, []);
+
   // Distribute images round-robin into columns (natural masonry order)
   const columns: Array<Array<{ img: Img; globalIdx: number }>> = Array.from({ length: cols }, () => []);
   images.forEach((img, idx) => {
@@ -78,15 +170,48 @@ export default function GalleryPage() {
           <p className="font-mono text-xs uppercase tracking-[0.35em] text-accent/90">Visual Archive</p>
           <div className="mt-3 flex items-end justify-between">
             <h1 className="font-anton text-[40px] uppercase leading-none sm:text-[60px] md:text-[75px]">Gallery</h1>
-            {!isLoading && !hasError && (
-              <p className="mb-1 font-mono text-xs uppercase text-space-cream/40">{images.length} images</p>
-            )}
+            <div className="mb-1 text-right font-mono text-xs uppercase text-space-cream/40">
+              {isLoading ? (
+                <p>Loading images...</p>
+              ) : !hasError ? (
+                <>
+                  <p>{images.length} images</p>
+                  {meta && (
+                    <p className="mt-1 text-[10px] text-space-cream/35">
+                      {meta.localCount} local / {meta.driveCount} drive
+                    </p>
+                  )}
+                </>
+              ) : null}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Gallery — flex columns */}
       <section className="mx-auto max-w-[1831px] px-3 py-8 sm:px-4 lg:px-6">
+        {!isLoading && !hasError && meta?.sheetError && (
+          <div className="mb-5 rounded-[18px] border border-amber-300/25 bg-amber-300/10 px-4 py-3 font-mono text-xs text-amber-100/80">
+            <p className="uppercase tracking-[0.2em] text-amber-200/90">Google Sheet images did not load</p>
+            <p className="mt-2 normal-case text-amber-100/70">{meta.sheetError}</p>
+            <p className="mt-2 normal-case text-amber-100/50">
+              Reading rows after row {meta.skippedRows} from the configured public CSV.
+            </p>
+          </div>
+        )}
+
+        {!isLoading && !hasError && meta && !meta.sheetError && meta.driveCount === 0 && (
+          <div className="mb-5 rounded-[18px] border border-sky-300/20 bg-sky-300/10 px-4 py-3 font-mono text-xs text-sky-100/80">
+            <p className="uppercase tracking-[0.2em] text-sky-200/90">Google Sheet loaded</p>
+            <p className="mt-2 normal-case text-sky-100/70">
+              Found {meta.sheetRowCount} sheet rows, skipped rows 1-{meta.skippedRows}, and found {meta.processedSheetRowCount} rows to parse.
+            </p>
+            <p className="mt-2 normal-case text-sky-100/50">
+              Add Drive links on row {meta.skippedRows + 1} or later to show them here.
+            </p>
+          </div>
+        )}
+
         {isLoading ? (
           // Skeleton: fixed columns with placeholder boxes
           <div style={{ display: "flex", gap: 8 }}>
@@ -132,10 +257,13 @@ export default function GalleryPage() {
                       <button
                         key={img.id}
                         type="button"
+                        className="group"
                         aria-label={`View image ${globalIdx + 1}`}
                         onClick={() => open(globalIdx)}
-                        onMouseEnter={() => setHoveredIdx(globalIdx)}
-                        onMouseLeave={() => setHoveredIdx(null)}
+                        data-gallery-item="true"
+                        data-idx={globalIdx}
+                        onMouseEnter={(e) => handleMouseEnter(globalIdx, e)}
+                        onMouseLeave={() => handleMouseLeave(globalIdx)}
                         style={{
                           display: "block",
                           width: "100%",
@@ -161,7 +289,7 @@ export default function GalleryPage() {
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={img.src}
-                          alt=""
+                          alt={img.caption ?? img.name}
                           loading="lazy"
                           decoding="async"
                           style={{
@@ -172,6 +300,11 @@ export default function GalleryPage() {
                             transform: isHov ? "scale(1.04)" : "scale(1)",
                           }}
                         />
+                        {img.caption && (
+                          <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-10 text-left font-mono text-xs text-white/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                            {img.caption}
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -227,7 +360,7 @@ function Lightbox({ image, index, total, onClose, onNext, onPrev }: {
   const onPE = (e: PointerEvent<HTMLDivElement>) => { if (drag.current?.pid === e.pointerId) drag.current = null; };
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/92"
+    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/95 backdrop-blur-3xl"
       role="dialog" aria-modal="true"
       onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div
@@ -236,17 +369,22 @@ function Lightbox({ image, index, total, onClose, onNext, onPrev }: {
         onClick={(e) => { if (e.target === e.currentTarget && zoom <= 1) onClose(); }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={image.src} alt="" draggable={false}
+        <img src={image.src} alt={image.caption ?? image.name} draggable={false}
           className="max-h-[90vh] max-w-[90vw] rounded-[8px] object-contain shadow-2xl"
           style={{ transform: `translate3d(${pan.x}px,${pan.y}px,0) scale(${zoom})`, transition: drag.current ? "none" : "transform 0.2s ease-out" }}
         />
       </div>
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-4 py-4">
-        <span className="pointer-events-auto rounded-full bg-black/50 px-4 py-2 font-mono text-xs uppercase text-white/60 backdrop-blur">
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/90 via-black/50 to-transparent px-4 pb-24 pt-4">
+        <span className="pointer-events-auto rounded-full border border-white/10 bg-black/80 px-4 py-2 font-mono text-xs uppercase text-white/80 backdrop-blur-md shadow-lg">
           {index + 1} / {total}
         </span>
+        {image.caption && (
+          <span className="pointer-events-auto max-w-[50vw] truncate rounded-full border border-white/10 bg-black/80 px-4 py-2 font-mono text-xs text-white/90 backdrop-blur-md shadow-lg">
+            {image.caption}
+          </span>
+        )}
         <div className="pointer-events-auto flex items-center gap-2">
-          <div className="flex items-center gap-1 rounded-full bg-black/50 p-1.5 backdrop-blur">
+          <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/80 p-1.5 shadow-lg backdrop-blur-md">
             <button onClick={() => setZ(zoom - 0.25)} className="flex h-9 w-9 items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white" aria-label="Zoom out">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0zm-6 0H8" /></svg>
             </button>
@@ -257,16 +395,16 @@ function Lightbox({ image, index, total, onClose, onNext, onPrev }: {
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0zm0-6v6m-3-3h6" /></svg>
             </button>
           </div>
-          <button onClick={onClose} className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white/70 backdrop-blur hover:bg-white/15 hover:text-white" aria-label="Close">
+          <button onClick={onClose} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/80 text-white/90 shadow-lg backdrop-blur-md hover:bg-white/20 hover:text-white" aria-label="Close">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
       </div>
       {total > 1 && <>
-        <button onClick={onPrev} className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-black/50 text-white/70 backdrop-blur hover:bg-white/15 hover:text-white" aria-label="Previous">
+        <button onClick={onPrev} className="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/80 text-white/90 shadow-lg backdrop-blur-md hover:bg-white/20 hover:text-white sm:left-5" aria-label="Previous">
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
         </button>
-        <button onClick={onNext} className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-black/50 text-white/70 backdrop-blur hover:bg-white/15 hover:text-white" aria-label="Next">
+        <button onClick={onNext} className="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/80 text-white/90 shadow-lg backdrop-blur-md hover:bg-white/20 hover:text-white sm:right-5" aria-label="Next">
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
         </button>
       </>}

@@ -17,6 +17,12 @@
 .DS_Store
 *.pem
 
+.next/
+.next/*
+
+Exp_Website\.next
+Exp_Website\.next
+
 # debug
 npm-debug.log*
 yarn-debug.log*
