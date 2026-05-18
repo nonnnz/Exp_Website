@@ -51,10 +51,10 @@ export const INTEREST_DEFS: Record<
   "ai agents": { en: "AI Agents", th: "AI Agents", tone: "orange-d", glyph: "AG" },
 };
 
-const SHEET_ID = "1OTDJzXn-x7Zj3XdIeyiM3iDefNhpXMv1S_XaOCQlbYA";
-const SHEET_GID = "1842186075";
+const SHEET_ID = process.env.MEMBERS_SHEET_ID;
+const SHEET_GID = process.env.MEMBERS_SHEET_GID;
 const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
-const AWARDS_SHEET_NAME = "รางวัล/ผลงาน";
+const AWARDS_SHEET_NAME = process.env.MEMBERS_AWARDS_SHEET_NAME ?? "รางวัล/ผลงาน";
 const AWARDS_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(AWARDS_SHEET_NAME)}`;
 
 const HEADERS = {
@@ -249,6 +249,11 @@ async function getAchievementsByMemberId(): Promise<Record<string, MemberAchieve
 }
 
 export async function getMembers(): Promise<Member[]> {
+  if (!SHEET_ID || !SHEET_GID) {
+    console.error("Missing MEMBERS_SHEET_ID or MEMBERS_SHEET_GID");
+    return [];
+  }
+
   try {
     const [memberRows, achievementsByMemberId] = await Promise.all([
       fetchCsv(SHEET_CSV_URL).then(csvToRows),

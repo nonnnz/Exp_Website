@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Footer from "@/components/Footer";
 
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/1OTDJzXn-x7Zj3XdIeyiM3iDefNhpXMv1S_XaOCQlbYA/export?format=csv";
+const SHEET_API_URL = "/api/sheets/clips";
 
 interface Clip {
   id: number;
@@ -159,7 +159,7 @@ export default function ClipPage() {
       } catch { /* ignore cache read errors */ }
 
       try {
-        const response = await fetch(SHEET_URL);
+        const response = await fetch(SHEET_API_URL);
         const text = await response.text();
         const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
         if (lines.length < 2) {

@@ -24,8 +24,7 @@ interface Comment {
   lng: number;
 }
 
-const SHEET_URL =
-  "https://docs.google.com/spreadsheets/d/1bWBUzCCMMToH-9TYQ4dqkW0L59QtJ0z98lZ7dY9iE90/export?format=csv";
+const SHEET_API_URL = "/api/sheets/about-comments";
 
 function parseCsvRow(row: string): string[] {
   const cells: string[] = [];
@@ -44,7 +43,7 @@ function parseCsvRow(row: string): string[] {
 }
 
 async function fetchSheetComments(): Promise<Comment[]> {
-  const res = await fetch(SHEET_URL);
+  const res = await fetch(SHEET_API_URL);
   if (!res.ok) return [];
   const csv = await res.text();
   const lines = csv.split(/\r?\n/).filter((l) => l.trim());
